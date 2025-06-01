@@ -2,7 +2,6 @@
 //  ContentView.swift
 //  PlanEat
 //
-//  Created by Se Yeon Bark on 2025-06-01.
 //
 
 import SwiftUI
@@ -10,10 +9,13 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width:350, height:500 )
                 .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+                .position(x: 190, y: 335)
+          
         }
         .padding()
     }
