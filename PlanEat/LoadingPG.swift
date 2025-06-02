@@ -12,9 +12,9 @@ struct ContentView: View {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width:350, height:500 )
+                .frame(width:100, height:500 )
                 .imageScale(.large)
-                .position(x: 190, y: 335)
+                .position(x: 180, y: 335)
           
         }
         .padding()

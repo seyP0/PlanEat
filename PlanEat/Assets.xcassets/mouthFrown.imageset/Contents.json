@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "Logo.png",
+      "filename" : "mouthFrown.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "faceLeft.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "faceRight.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
