@@ -11,7 +11,7 @@ import SwiftUI
 struct PlanEatApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoadingPG()
         }
     }
 }

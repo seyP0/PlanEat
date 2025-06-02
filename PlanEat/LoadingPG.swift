@@ -6,21 +6,28 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct LoadingPG: View {
+    @State private var isActive = false
+    
     var body: some View {
-        VStack {
-            Image("Logo")
-                .resizable()
-                .scaledToFit()
-                .frame(width:100, height:500 )
-                .imageScale(.large)
-                .position(x: 180, y: 335)
-          
+        if isActive {
+            Home() // <- This is the actual home screen you'll build next
+        } else {
+            VStack {
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 200, height: 200)
+                
+            
+            }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    withAnimation {
+                        self.isActive = true
+                    }
+                }
+            }
         }
-        .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
