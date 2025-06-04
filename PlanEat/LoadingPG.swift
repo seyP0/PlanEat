@@ -70,16 +70,17 @@ struct LoadingPG: View {
                     .offset(x: 43, y: 12) // tweak this until it's centered inside the second "a"
                 }
                 .padding(.top, 60)
+                .offset(x: 15, y: -50)
             }
             .onAppear {
                 // Animate mouths
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     leftMouth = "mouthSmile"
                     rightMouth = "mouthFrown"
                 }
 
                 // Navigate to next screen
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation {
                         isActive = true
                     }
