@@ -1,5 +1,6 @@
 import SwiftUI
 
+
 struct LogIn: View {
     @State private var email = ""
     @State private var password = ""
@@ -71,31 +72,74 @@ struct LogIn: View {
             }
             .padding(.horizontal, 32)
 
-            // Google & Apple Sign-In Buttons
-            HStack(spacing: 24) {
-                Image("Google")
-                    .resizable()
-                    .frame(width: 44, height: 44)
 
-                Image("Apple")
-                    .resizable()
-                    .frame(width: 44, height: 44)
+            
+            HStack(spacing:24) {
+                Button(action: {}) {
+                    ZStack {
+                        Rectangle()
+                            .frame(width: 64, height: 64)
+                            .foregroundColor(.white)
+                            .cornerRadius(17)
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        
+                        Image("Google")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 32, height: 32)
+                    }
+                }
+                Button(action: {}) {
+                    ZStack {
+                        Rectangle()
+                            .frame(width: 64, height: 64)
+                            .foregroundColor(.white)
+                            .cornerRadius(17)
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        
+                        Image("Apple")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 32, height: 32)
+                    }
+                }
             }
 
-            // Sign Up / Forgot Password Links
-            VStack(spacing: 4) {
-                HStack {
-                    Text("Don't have an account?")
-                    Button("Sign Up") {
-                        // Handle sign up nav
-                    }.fontWeight(.medium)
-                }
+                
 
-                Button("Forgot password?") {
+            // Sign Up / Forgot Password Links
+            VStack(spacing: 1) {
+                HStack(spacing: 0){
+                    
+                    Text("Don’t have an account?")
+                      .font(Font.custom("ABeeZee", size: 10))
+                      .multilineTextAlignment(.center)
+                      .foregroundColor(.black)
+                      .frame(width: 120, height: 19, alignment: .top)
+                      
+                    Button(action:{}) { // Handle signup for account with email and password
+                    }
+                        Text("Sign Up")
+                            .font(Font.custom("ABeeZee", size: 10))
+                            .underline(true, pattern: .solid)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
+
+                            .frame(width: 40, height: 19, alignment: .top)
+                            .offset(x: -3)
+                    
+                }
+                
+  
+                Button(action: {}) {
                     // Handle forgot password
                 }
-                .font(.footnote)
-                .foregroundColor(.gray)
+                    Text("Forgot Password?")
+                        .font(Font.custom("ABeeZee", size: 10))
+                        .underline(true, pattern: .solid)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
+                        .frame(width: 182, height: 19, alignment: .top)
             }
             .padding(.top, 8)
 

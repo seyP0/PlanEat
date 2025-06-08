@@ -18,6 +18,7 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>ABeeZee-Regular.ttf</string>
 		<string>Baloo_Bhaijaan_2.ttf</string>
 	</array>
 </dict>
