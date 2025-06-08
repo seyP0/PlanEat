@@ -1,5 +1,5 @@
 import SwiftUI
-
+import FirebaseAuth
 
 struct LogIn: View {
     @State private var email = ""
@@ -15,8 +15,8 @@ struct LogIn: View {
                 .scaledToFit()
                 .multilineTextAlignment(.center)
                 .frame(width: 241.26923, height: 220, alignment: .top)
-            
-            
+
+
             // Email + Password Fields
             VStack(spacing: 19) {
                 TextField("Email", text: $email)
@@ -37,7 +37,7 @@ struct LogIn: View {
                     .background(Color.white)
                     .cornerRadius(17)
                     .shadow(color: .black.opacity(0.25), radius: 5, x: 0, y: 4)
-                 
+
 
             }
             .frame(maxWidth: .infinity)
@@ -45,7 +45,13 @@ struct LogIn: View {
 
             // Sign In Button
             Button(action: {
-                // Handle sign in
+                Auth.auth().signIn(withEmail: email, password: password) { result, error in
+                    if let error = error {
+                        print("Login failed:", error.localizedDescription)
+                    } else {
+                        print("Login success! UID:", result?.user.uid ?? "")
+                    }
+                }
             }) {
                 Text("Sign In")
                     .frame(maxWidth: .infinity)
@@ -57,14 +63,14 @@ struct LogIn: View {
                     .foregroundColor(.white)
                     .cornerRadius(17)
                     .shadow(color: .black.opacity(0.25), radius: 5, x: 0, y: 4)
-             
+
             }
             .frame(maxWidth: .infinity) //The button fills the width minus 36pt padding on both sides.
             .padding(.horizontal, 50)
 
             // OR Divider
             HStack {
-                
+
                 Rectangle().frame(width: 70, height: 1).foregroundColor(.black)
                 Text("or").foregroundColor(.black)
                     .font(Font.custom("Baloo Bhaijaan 2", size: 12))
@@ -73,7 +79,7 @@ struct LogIn: View {
             .padding(.horizontal, 32)
 
 
-            
+
             HStack(spacing:24) {
                 Button(action: {}) {
                     ZStack {
@@ -82,7 +88,7 @@ struct LogIn: View {
                             .foregroundColor(.white)
                             .cornerRadius(17)
                             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        
+
                         Image("Google")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -96,7 +102,7 @@ struct LogIn: View {
                             .foregroundColor(.white)
                             .cornerRadius(17)
                             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        
+
                         Image("Apple")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -105,18 +111,18 @@ struct LogIn: View {
                 }
             }
 
-                
+
 
             // Sign Up / Forgot Password Links
             VStack(spacing: 1) {
                 HStack(spacing: 0){
-                    
+
                     Text("Don’t have an account?")
                       .font(Font.custom("ABeeZee", size: 10))
                       .multilineTextAlignment(.center)
                       .foregroundColor(.black)
                       .frame(width: 120, height: 19, alignment: .top)
-                      
+
                     Button(action:{}) { // Handle signup for account with email and password
                     }
                         Text("Sign Up")
@@ -127,10 +133,10 @@ struct LogIn: View {
 
                             .frame(width: 40, height: 19, alignment: .top)
                             .offset(x: -3)
-                    
+
                 }
-                
-  
+
+
                 Button(action: {}) {
                     // Handle forgot password
                 }
@@ -168,6 +174,3 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
-
-
-

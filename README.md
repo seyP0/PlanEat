@@ -45,7 +45,7 @@
 
 ## 📱 Screenshots
 
-*(screenshots comming...)*
+*(screenshots coming...)*
 
 ---
 

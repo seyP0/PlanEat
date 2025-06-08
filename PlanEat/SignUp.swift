@@ -1,11 +1,12 @@
 import SwiftUI
+import FirebaseAuth
 
 struct SignUpView: View {
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
     @State private var dob = Date()
-    
+
     @State private var selectedGender = ""
     @State private var selectedGoal = ""
     @State private var selectedCondition = ""
@@ -42,7 +43,13 @@ struct SignUpView: View {
             CustomPicker(label: "Special Condition", selection: $selectedCondition, options: conditions)
 
             Button(action: {
-                // Handle create action
+                Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                    if let error = error {
+                        print("Sign Up failed:", error.localizedDescription)
+                    } else {
+                        print("Sign Up success! UID:", result?.user.uid ?? "")
+                    }
+                }
             }) {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
