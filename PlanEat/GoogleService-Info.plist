@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>911547843125-pifa9v1q9mkves2gab56ddr0l7t4si9u.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.911547843125-pifa9v1q9mkves2gab56ddr0l7t4si9u</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBvCBcVND8CdWASknSzwi87N2wW0xdNfrg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>911547843125</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>python.PlanEat</string>
+	<key>PROJECT_ID</key>
+	<string>planeat-4bbab</string>
+	<key>STORAGE_BUCKET</key>
+	<string>planeat-4bbab.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:911547843125:ios:92382af7ccea0cbdfae77c</string>
+</dict>
+</plist>

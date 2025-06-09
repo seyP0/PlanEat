@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EE16BFF12DF66EFB00828FE7 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = EE16BFF02DF66EFB00828FE7 /* FirebaseAuth */; };
+		EE16BFF32DF66EFB00828FE7 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = EE16BFF22DF66EFB00828FE7 /* FirebaseCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EE9C52FB2DED165D002A06E4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE16BFF32DF66EFB00828FE7 /* FirebaseCore in Frameworks */,
+				EE16BFF12DF66EFB00828FE7 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,6 +133,8 @@
 			);
 			name = PlanEat;
 			packageProductDependencies = (
+				EE16BFF02DF66EFB00828FE7 /* FirebaseAuth */,
+				EE16BFF22DF66EFB00828FE7 /* FirebaseCore */,
 			);
 			productName = PlanEat;
 			productReference = EE9C52ED2DED165C002A06E4 /* PlanEat.app */;
@@ -209,6 +218,9 @@
 			);
 			mainGroup = EE9C52E42DED165C002A06E4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EE9C52EE2DED165C002A06E4 /* Products */;
 			projectDirPath = "";
@@ -574,6 +586,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EE16BFF02DF66EFB00828FE7 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		EE16BFF22DF66EFB00828FE7 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EE9C52E52DED165C002A06E4 /* Project object */;
 }
