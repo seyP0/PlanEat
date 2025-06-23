@@ -1,7 +1,7 @@
 import SwiftUI
 import FirebaseAuth
 
-struct SignUpView: View {
+struct SignUp: View {
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -16,7 +16,7 @@ struct SignUpView: View {
     let conditions = ["None", "Diabetes", "Hypertension", "Allergies"]
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 10) {
             Group {
                 CustomTextField(label: "Name", text: $name)
                 CustomTextField(label: "Email", text: $email)
@@ -25,6 +25,8 @@ struct SignUpView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Date of Birth")
                         .font(.custom("Baloo Bhaijaan 2", size: 14))
+                        .padding(.leading, 8) // Adjust value (e.g., 8, 12) as needed
+
                     HStack {
                         DatePicker("", selection: $dob, displayedComponents: .date)
                             .labelsHidden()
@@ -32,12 +34,16 @@ struct SignUpView: View {
                         Image(systemName: "calendar")
                     }
                     .padding()
+                    .frame(width: 300, height: 60)
                     .background(Color.white)
                     .cornerRadius(20)
                     .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 4)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 20) // Or match padding with your other fields
+                
             }
-
+     
             CustomPicker(label: "Gender", selection: $selectedGender, options: genders)
             CustomPicker(label: "Goal", selection: $selectedGoal, options: goals)
             CustomPicker(label: "Special Condition", selection: $selectedCondition, options: conditions)
@@ -54,13 +60,13 @@ struct SignUpView: View {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .padding()
-                    .frame(width: 140)
+                    .frame(width: 99, height: 55)
                     .background(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .foregroundColor(.white)
                     .cornerRadius(20)
                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
             }
-            .padding(.top, 30)
+            .padding(.top, 20)
         }
         .padding()
         .background(Color(red: 0.89, green: 0.96, blue: 0.97).ignoresSafeArea())
@@ -72,9 +78,12 @@ struct CustomTextField: View {
     var isSecure: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(label)
                 .font(.custom("Baloo Bhaijaan 2", size: 14))
+                .padding(.leading, 8) // Adjust value (e.g., 8, 12) as needed
+
+            
             Group {
                 if isSecure {
                     SecureField("", text: $text)
@@ -83,12 +92,14 @@ struct CustomTextField: View {
                 }
             }
             .padding()
+            .frame(width: 300)
             .background(Color.white)
             .cornerRadius(20)
             .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 4)
         }
     }
 }
+
 
 struct CustomPicker: View {
     var label: String
@@ -96,20 +107,43 @@ struct CustomPicker: View {
     var options: [String]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.custom("Baloo Bhaijaan 2", size: 14))
-            Picker("", selection: $selection) {
-                ForEach(options, id: \.self) {
-                    Text($0)
+                .padding(.leading, 8)
+
+            Menu {
+                ForEach(options, id: \.self) { option in
+                    Button(action: {
+                        selection = option
+                    }) {
+                        Text(option)
+                    }
                 }
+            } label: {
+                HStack {
+                    Text(selection.isEmpty ? "Select" : selection)
+                        .foregroundColor(selection.isEmpty ? .gray : .black)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .frame(width: 300, height: 55)
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 4)
             }
-            .pickerStyle(MenuPickerStyle())
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .cornerRadius(20)
-            .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 4)
         }
+        .frame(maxHeight: .infinity)
+        .padding(.horizontal, 20) // Or match padding with your other fields
     }
 }
+
+struct SignUp_Previews: PreviewProvider {
+    static var previews: some View {
+        SignUp()
+            .previewDevice("iPhone 16")
+    }
+}
+
