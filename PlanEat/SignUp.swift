@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct SignUpView: View {
     @State private var name = ""
@@ -42,15 +43,34 @@ struct SignUpView: View {
             CustomPicker(label: "Goal", selection: $selectedGoal, options: goals)
             CustomPicker(label: "Special Condition", selection: $selectedCondition, options: conditions)
 
-            Button(action: {
-                Auth.auth().createUser(withEmail: email, password: password) { result, error in
-                    if let error = error {
-                        print("Sign Up failed:", error.localizedDescription)
-                    } else {
-                        print("Sign Up success! UID:", result?.user.uid ?? "")
-                    }
+                Button(action: {
+    Auth.auth().createUser(withEmail: email, password: password) { result, error in
+        if let error = error {
+            print("Sign Up failed:", error.localizedDescription)
+        } else if let result = result {
+            print("Sign Up success! UID:", result.user.uid)
+
+            let db = Firestore.firestore()
+            db.collection("users").document(result.user.uid).setData([
+                "name": name,
+                "email": email,
+                "dob": Timestamp(date: dob),
+                "gender": selectedGender,
+                "goal": selectedGoal,
+                "condition": selectedCondition,
+                "createdAt": Timestamp()
+            ]) { err in
+                if let err = err {
+                    print("Error saving user profile:", err.localizedDescription)
+                } else {
+                    print("User profile saved to Firestore!")
                 }
-            }) {
+            }
+        }
+    }
+})
+
+ {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .padding()
