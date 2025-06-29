@@ -1,5 +1,7 @@
 import SwiftUI
 import FirebaseAuth
+import Firebase
+import FirebaseFirestore
 
 struct SignUp: View {
     @State private var name = ""
