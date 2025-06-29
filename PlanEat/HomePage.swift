@@ -271,11 +271,10 @@ struct MealCard: View {
 
 struct BottomNavigationBar: View {
     var body: some View {
-        // Tab Bar
         ZStack {
             CustomTabBarShape()
                 .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
-                .frame(width: 450, height: 90)
+                .frame(height: 90)
                 .edgesIgnoringSafeArea(.bottom)
 
             HStack {
@@ -290,11 +289,11 @@ struct BottomNavigationBar: View {
                         .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
                         .frame(width: 95, height: 95)
                         .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
-                        .offset(x: -1, y: 15)
+                        .offset(y: 15)
                     Image(systemName: "calendar")
                         .foregroundColor(.white)
                         .font(.system(size: 25))
-                        .offset(x: -1, y: 12)
+                        .offset(y: 12)
                 }
                 .offset(y: -40)
                 Spacer()
@@ -310,65 +309,59 @@ struct BottomNavigationBar: View {
                 Spacer()
             }
         }
-        .padding(.top, 30)
-        .frame(width: 393, height: 852)
-        .background(Color.white)
+        .frame(height: 100)
     }
 }
+
 
 struct CustomTabBarShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
         let width = rect.width
-        let height = rect.height + 40
+        let height = rect.height
         let cornerRadius: CGFloat = 16
-        let notchRadius: CGFloat = 65
-        let centerX = width / 2 - 40
-        let notchDepth: CGFloat = 20// how far the notch cuts down
+        let notchRadius: CGFloat = 38
+        let notchDepth: CGFloat = 25
+        let iconCount: CGFloat = 5
+        let homeIndex: CGFloat = 0  // Index for home icon
+        let iconSpacing = width / iconCount
+        let centerX = iconSpacing * (homeIndex + 0.5)  // center of the home icon
 
         // Start from bottom-left
         path.move(to: CGPoint(x: 0, y: height))
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
 
-        // Left edge before notch
-        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
-        path.addQuadCurve(
-            to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
-            control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
-        )
+        // Left of notch
+        path.addLine(to: CGPoint(x: centerX - notchRadius - 10, y: 0))
+        path.addQuadCurve(to: CGPoint(x: centerX - notchRadius, y: notchDepth),
+                          control: CGPoint(x: centerX - notchRadius + 2, y: 0))
 
-        // Arc cutting downward for notch
-        path.addArc(
-            center: CGPoint(x: centerX, y: notchDepth),
-            radius: notchRadius,
-            startAngle: .degrees(180),
-            endAngle: .degrees(0),
-            clockwise: true
-        )
+        // Notch arc
+        path.addArc(center: CGPoint(x: centerX, y: notchDepth),
+                    radius: notchRadius,
+                    startAngle: .degrees(180),
+                    endAngle: .degrees(0),
+                    clockwise: true)
 
-        // Right edge after notch
-//        path.addQuadCurve(
-//            to: CGPoint(x: centerX + notchRadius + 20, y: notchDepth / 20),
-//            control: CGPoint(x: centerX + notchRadius , y: notchDepth / 60 )
-//        )
-        path.addQuadCurve(
-            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
-            control: CGPoint(x: centerX + notchRadius + 1, y: 0)
-        )
+        // Right of notch
+        path.addQuadCurve(to: CGPoint(x: centerX + notchRadius + 10, y: 0),
+                          control: CGPoint(x: centerX + notchRadius - 2, y: 0))
 
-
+        // Continue right
         path.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
-        path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius), control: CGPoint(x: width, y: 0))
+        path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius),
+                          control: CGPoint(x: width, y: 0))
 
-        // Close bottom
+        // Bottom edge
         path.addLine(to: CGPoint(x: width, y: height))
         path.closeSubpath()
 
         return path
     }
 }
+
 
 struct HomePage_previews: PreviewProvider {
     static var previews: some View {

@@ -77,7 +77,7 @@ struct SignUp: View {
     }
 })
 
- {
+            {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .padding()
