@@ -42,15 +42,31 @@ struct SignUpView: View {
             CustomPicker(label: "Goal", selection: $selectedGoal, options: goals)
             CustomPicker(label: "Special Condition", selection: $selectedCondition, options: conditions)
 
-            Button(action: {
-                Auth.auth().createUser(withEmail: email, password: password) { result, error in
-                    if let error = error {
-                        print("Sign Up failed:", error.localizedDescription)
-                    } else {
-                        print("Sign Up success! UID:", result?.user.uid ?? "")
+                            Button(action: {
+                    Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                        if let error = error {
+                            print("Sign Up failed:", error.localizedDescription)
+                        } else if let uid = result?.user.uid {
+                            let db = Firestore.firestore()
+                            db.collection("users").document(uid).setData([
+                                "name": name,
+                                "email": email,
+                                "dob": Timestamp(date: dob),
+                                "gender": selectedGender,
+                                "goal": selectedGoal,
+                                "condition": selectedCondition,
+                                "createdAt": FieldValue.serverTimestamp()
+                            ]) { error in
+                                if let error = error {
+                                    print("Failed to store user data:", error.localizedDescription)
+                                } else {
+                                    print("User data saved for UID:", uid)
+                                }
+                            }
+                        }
                     }
-                }
-            }) {
+                })
+ {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .padding()
