@@ -30,7 +30,7 @@ struct NutritionFactsPopup: View {
                                 .font(.system(size: 18, weight: .bold))
 
                             VStack(spacing: 20) {
-                                Text("Avocado Egg Toast")
+                                Text("--")
                                     .underline()
                                     .font(.system(size: 14, weight: .bold))
 
@@ -43,26 +43,26 @@ struct NutritionFactsPopup: View {
                                     }
 
                                     HStack {
-                                        Text("\u{2022} 1/2 Avocado").frame(width: 120, alignment: .leading).font(.system(size: 11))
-                                        Text("15g").frame(width: 50, alignment: .leading).font(.system(size: 11))
-                                        Text("1.5g").frame(width: 40, alignment: .leading).font(.system(size: 11))
-                                        Text("9g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 120, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 40, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 50, alignment: .leading).font(.system(size: 11))
                                     }
                                     HStack {
-                                        Text("\u{2022} 1 Egg").frame(width: 120, alignment: .leading).font(.system(size: 11))
-                                        Text("6g").frame(width: 50, alignment: .leading).font(.system(size: 11))
-                                        Text("5g").frame(width: 40, alignment: .leading).font(.system(size: 11))
-                                        Text("0.5g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 120, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 40, alignment: .leading).font(.system(size: 11))
+                                        Text("--g").frame(width: 50, alignment: .leading).font(.system(size: 11))
                                     }
                                     HStack {
-                                        Text("\u{2022} 1 slice of toast").frame(width: 120, alignment: .leading).font(.system(size: 11))
-                                        Text("4g").frame(width: 50, alignment: .leading).font(.system(size: 11))
-                                        Text("1.5g").frame(width: 40, alignment: .leading).font(.system(size: 11))
-                                        Text("15g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 120, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 40, alignment: .leading).font(.system(size: 11))
+                                        Text("--").frame(width: 50, alignment: .leading).font(.system(size: 11))
                                     }
                                 }
 
-                                Text("Total Calories: 350")
+                                Text("Total Calories: --")
                                     .font(.system(size: 11, weight: .bold))
                             }
                             .frame(width: 290)
@@ -73,7 +73,7 @@ struct NutritionFactsPopup: View {
                             .shadow(color: .black.opacity(0.65), radius: 2, x:0, y:3)
 
                             VStack(spacing: 10) {
-                                Text("1 cup of Milk")
+                                Text("--")
                                     .underline()
                                     .font(.system(size: 14, weight: .bold))
                                     .padding(.bottom, 1)
@@ -84,12 +84,12 @@ struct NutritionFactsPopup: View {
                                     Text("Carbs").bold().frame(width: 50, alignment: .leading).font(.system(size: 11))
                                 }
                                 HStack {
-                                    Text("8g").frame(width: 60, alignment: .leading).font(.system(size: 11))
-                                    Text("5g").frame(width: 40, alignment: .leading).font(.system(size: 11))
-                                    Text("12g").frame(width: 50, alignment: .leading).font(.system(size: 11))
+                                    Text("--g").frame(width: 60, alignment: .leading).font(.system(size: 11))
+                                    Text("--g").frame(width: 40, alignment: .leading).font(.system(size: 11))
+                                    Text("--g").frame(width: 50, alignment: .leading).font(.system(size: 11))
                                 }
 
-                                Text("Total Calories: 125")
+                                Text("Total Calories: --")
                                     .font(.system(size: 11, weight: .bold))
                             }
                             .frame(width: 290)
