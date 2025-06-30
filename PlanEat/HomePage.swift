@@ -272,46 +272,72 @@ struct MealCard: View {
 struct BottomNavigationBar: View {
     var body: some View {
         ZStack {
+            // Background shape with notch
             CustomTabBarShape()
                 .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                 .frame(height: 90)
                 .edgesIgnoringSafeArea(.bottom)
 
-            HStack {
-                Spacer()
-                Image(systemName: "house")
-                    .font(.system(size: 25))
-                    .foregroundColor(.white)
-                    .offset(x: 1, y: 3)
-                Spacer()
-                ZStack {
-                    Circle()
-                        .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
-                        .frame(width: 95, height: 95)
-                        .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
-                        .offset(y: 15)
+            HStack(spacing: 0) {
+                // HOME — centered under circle
+                VStack {
+                    Spacer()
+                    Image(systemName: "house.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+                // CALENDAR
+                VStack {
+                    Spacer()
                     Image(systemName: "calendar")
                         .foregroundColor(.white)
                         .font(.system(size: 25))
-                        .offset(y: 12)
+                    Spacer()
                 }
-                .offset(y: -40)
-                Spacer()
-                Image(systemName: "star")
-                    .font(.system(size: 25))
-                    .foregroundColor(.white)
-                    .offset(x: 2, y: 3)
-                Spacer()
-                Image(systemName: "person")
-                    .font(.system(size: 25))
-                    .foregroundColor(.white)
-                    .offset(x: -1, y: 3)
-                Spacer()
+                .frame(maxWidth: .infinity)
+
+                // STAR
+                VStack {
+                    Spacer()
+                    Image(systemName: "star")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+                // PERSON
+                VStack {
+                    Spacer()
+                    Image(systemName: "person")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
             }
+            .padding(.horizontal, 20)
+
+            // Floating circle (active tab)
+            Circle()
+                .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
+                .frame(width: 95, height: 95)
+                .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
+                .overlay(
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 25))
+                        .foregroundColor(.white)
+                )
+                .offset(x: -UIScreen.main.bounds.width / 2 + 60, y: -25)
         }
-        .frame(height: 100)
+        .frame(height: 90)
     }
 }
+
+
 
 
 struct CustomTabBarShape: Shape {
@@ -319,42 +345,33 @@ struct CustomTabBarShape: Shape {
         var path = Path()
 
         let width = rect.width
-        let height = rect.height
+        let height = rect.height + 40
         let cornerRadius: CGFloat = 16
-        let notchRadius: CGFloat = 38
-        let notchDepth: CGFloat = 25
-        let iconCount: CGFloat = 5
-        let homeIndex: CGFloat = 0  // Index for home icon
-        let iconSpacing = width / iconCount
-        let centerX = iconSpacing * (homeIndex + 0.5)  // center of the home icon
+        let notchRadius: CGFloat = 65
+        let centerX = width / 2 - 140
+        let notchDepth: CGFloat = 20
 
-        // Start from bottom-left
         path.move(to: CGPoint(x: 0, y: height))
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
-
-        // Left of notch
-        path.addLine(to: CGPoint(x: centerX - notchRadius - 10, y: 0))
-        path.addQuadCurve(to: CGPoint(x: centerX - notchRadius, y: notchDepth),
-                          control: CGPoint(x: centerX - notchRadius + 2, y: 0))
-
-        // Notch arc
-        path.addArc(center: CGPoint(x: centerX, y: notchDepth),
-                    radius: notchRadius,
-                    startAngle: .degrees(180),
-                    endAngle: .degrees(0),
-                    clockwise: true)
-
-        // Right of notch
-        path.addQuadCurve(to: CGPoint(x: centerX + notchRadius + 10, y: 0),
-                          control: CGPoint(x: centerX + notchRadius - 2, y: 0))
-
-        // Continue right
+        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
+        path.addQuadCurve(
+            to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
+            control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
+        )
+        path.addArc(
+            center: CGPoint(x: centerX, y: notchDepth),
+            radius: notchRadius,
+            startAngle: .degrees(180),
+            endAngle: .degrees(0),
+            clockwise: true
+        )
+        path.addQuadCurve(
+            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
+            control: CGPoint(x: centerX + notchRadius + 1, y: 0)
+        )
         path.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
-        path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius),
-                          control: CGPoint(x: width, y: 0))
-
-        // Bottom edge
+        path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius), control: CGPoint(x: width, y: 0))
         path.addLine(to: CGPoint(x: width, y: height))
         path.closeSubpath()
 
