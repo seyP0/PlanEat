@@ -1,30 +1,27 @@
 import SwiftUI
 
-struct ForgotPasswordView: View {
+struct VerifyEmailView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var email: String = ""
+    @State private var code: [String] = ["", "", "", ""]
 
-    // Custom colors matching the design
+    // Colors
     private let backgroundColor = Color(red: 237/255, green: 249/255, blue: 249/255)
     private let accentColor = Color(red: 116/255, green: 146/255, blue: 161/255)
 
     var body: some View {
         ZStack {
-            // Background
             backgroundColor
                 .edgesIgnoringSafeArea(.all)
 
-            VStack {
+            VStack(spacing: 30) {
                 // Top navigation
-                HStack(spacing: 13) {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                HStack(spacing: 12) {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.black)
                     }
-                    Text("Forgot password")
+                    Text("Verify Your Email")
                         .font(.subheadline)
                         .foregroundColor(.black)
                     Spacer()
@@ -33,14 +30,15 @@ struct ForgotPasswordView: View {
                 .padding()
                 Spacer()
 
-                // Lock icon in circle
+                // Paper plane icon in circle
                 ZStack {
                     Circle()
                         .fill(Color.white)
                         .frame(width: 200, height: 200)
                         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
 
-                    Image(systemName: "lock.fill")
+                    // Replace "paperplane" with your asset name
+                    Image(systemName: "paperplane.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 80, height: 80)
@@ -51,44 +49,61 @@ struct ForgotPasswordView: View {
                     .padding(.bottom ,-10)
 
                 // Instruction text
-                Text("Please enter your email address\nto receive a verification cord.")
+                Text("Please enter the 4‑digit code sent via email")
                     .font(Font.custom("Baloo Bhaijaan 2", size: 15))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.black)
-                    .padding(.horizontal, 30)
-                
+                    .padding(.vertical, -40)
+                    .frame(width: 300, height: 21, alignment: .top)
+                    
 
-                
-                // Email input
-                TextField("Email", text: $email)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-                    .padding(.horizontal, 40)
-                    .padding(.top, 20)
+                // Code fields
+                HStack(spacing: 15) {
+                    ForEach(0..<4) { index in
+                        TextField("", text: $code[index])
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.center)
+                            .font(.title2)
+                            .frame(width: 50, height: 50)
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    }
+                }
+                .padding(.vertical, -40)
 
-                // Send button
+                // Resend link
                 Button(action: {
-                    // TODO: handle send action
+                    // TODO: resend code
                 }) {
-                    Text("Send")
+                    Text("Resend Code")
+                        .font(.caption)
+                        .foregroundColor(accentColor)
+                        .underline(true, pattern: .solid)
+                        .padding(.vertical, 10)
+
+                }
+
+                // Verify button
+                Button(action: {
+                    // TODO: verify code
+                }) {
+                    Text("Verify")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(width: 140, height: 45)
                         .background(accentColor)
                         .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 }
-                .padding(.top, 30)
-
                 Spacer()
             }
         }
     }
 }
 
-struct ForgotPasswordView_Previews: PreviewProvider {
+struct VerifyEmailView_Previews: PreviewProvider {
     static var previews: some View {
-        ForgotPasswordView()
+        VerifyEmailView()
     }
 }
