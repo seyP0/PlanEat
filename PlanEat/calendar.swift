@@ -1,15 +1,47 @@
 import SwiftUI
 
 struct CalendarSmileView: View {
-    let days = ["sun", "mon", "tues", "wed", "thurs", "fri", "sat"]
-    let dates = Array(1...31)
+    @State private var currentDate = Date()
+    private let calendar = Calendar.current
+
+    // Shortened weekday symbols e.g., Sun, Mon, Tue
+    private var weekdays: [String] {
+        let symbols = calendar.shortWeekdaySymbols
+        let first = calendar.firstWeekday - 1
+        let reordered = Array(symbols[first...] + symbols[..<first])
+        return reordered.map { String($0.prefix(3)).capitalized }
+    }
+
+    // Header text "May 2025"
+    private var monthYearText: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "LLLL yyyy"
+        return formatter.string(from: currentDate)
+    }
+
+    // All dates of current month
+    private var monthDates: [Date] {
+        guard let range = calendar.range(of: .day, in: .month, for: currentDate),
+              let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))
+        else { return [] }
+        return range.compactMap { day in
+            calendar.date(byAdding: .day, value: day - 1, to: monthStart)
+        }
+    }
+
+    // Number of leading blanks before first weekday
+    private var leadingBlankCount: Int {
+        guard let first = monthDates.first else { return 0 }
+        let weekday = calendar.component(.weekday, from: first) - calendar.firstWeekday
+        return weekday < 0 ? weekday + 7 : weekday
+    }
 
     var body: some View {
-        VStack(spacing: 60) {
+        VStack(spacing: 45) {
             // Header
             HStack {
                 Spacer()
-                Text("May 2025")
+                Text(monthYearText)
                     .font(.title2)
                     .bold()
                 Image(systemName: "chevron.down")
@@ -17,52 +49,50 @@ struct CalendarSmileView: View {
                     .offset(x: 5)
                 Spacer()
             }
-            .offset(x: 10, y: 10)
+            .padding(.vertical, 10)
 
-            VStack {
-                // Weekday row
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
-                    ForEach(days, id: \.self) { day in
-                        Text(day)
-                            .font(.caption)
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                    }
+            // Weekday labels
+            LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7), spacing: 5) {
+                ForEach(weekdays, id: \.self) { day in
+                    Text(day)
+                        .font(.caption)
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
                 }
-                .offset(y: -50)
-
-                // Calendar Grid
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 25) {
-                    ForEach(0..<42, id: \.self) { index in
-                        if index < 4 {
-                            Color.clear.frame(height: 44)
-                        } else if index - 4 < dates.count {
-                            VStack(spacing: 5) {
-                                Image("smile 2")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 50, height: 50)
-                                Text("\(dates[index - 4])")
-                                    .font(.caption2)
-                                    .foregroundColor(.black)
-                            }
-                            .frame(maxWidth: .infinity)
-                        } else {
-                            Color.clear.frame(height: 44)
-                        }
-                    }
-                }
-                .offset(y: -15)
             }
-            .offset(y: 65)
 
+            // Dates grid
+            LazyVGrid(columns: Array(repeating: .init(.flexible(), spacing: 4), count: 7), spacing: 25) {
+                // Leading blanks
+                ForEach(0..<leadingBlankCount, id: \.self) { _ in
+                    Color.clear.frame(height: 50)
+                }
+                // Days
+                ForEach(monthDates, id: \.self) { date in
+                    let day = calendar.component(.day, from: date)
+                    VStack(spacing: 4) {
+                        Image("smile 2")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 50, height: 50)
+                        Text("\(day)")
+                            .font(.caption2)
+                            .foregroundColor(calendar.isDate(date, inSameDayAs: currentDate) ? .blue : .black)
+                    }
+                }
+            }
+            .offset(y: -15)
+
+            Spacer()
+
+            // Tab bar omitted for brevity
             // Tab Bar
             ZStack {
                 CustomTabBarShape()
                     .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .frame(width: 450, height: 90)
                     .edgesIgnoringSafeArea(.bottom)
-
+                
                 HStack {
                     Spacer()
                     Image(systemName: "house")
@@ -97,7 +127,6 @@ struct CalendarSmileView: View {
             }
         }
         .padding(.top, 30)
-        .frame(width: 393, height: 852)
         .background(Color.white)
     }
 }
@@ -155,11 +184,8 @@ struct CustomTabBarShape: Shape {
         return path
     }
 }
-
-
 struct CalendarSmileView_Previews: PreviewProvider {
     static var previews: some View {
         CalendarSmileView()
     }
 }
-
