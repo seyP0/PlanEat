@@ -141,4 +141,6 @@ struct MoodPopupView_Previews: PreviewProvider {
         MoodPopupView()
             .previewLayout(.sizeThatFits)
     }
+
+    
 }
