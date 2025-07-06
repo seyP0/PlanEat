@@ -88,7 +88,7 @@ struct CalendarSmileView: View {
             // Tab bar omitted for brevity
             // Tab Bar
             ZStack {
-                CustomTabBarShape()
+                CustomTabBar()
                     .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .frame(width: 450, height: 90)
                     .edgesIgnoringSafeArea(.bottom)
@@ -131,7 +131,7 @@ struct CalendarSmileView: View {
     }
 }
 
-struct CustomTabBarShape: Shape {
+struct CustomTabBar: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
@@ -189,3 +189,5 @@ struct CalendarSmileView_Previews: PreviewProvider {
         CalendarSmileView()
     }
 }
+
+

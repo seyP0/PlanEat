@@ -5,13 +5,22 @@ struct MealView: View {
         VStack(spacing: 0) {
             
             // Top Navigation Bar
-            HStack {
-                Image(systemName: "chevron.left")
-                Text("Home")
-                    .font(.headline)
+            HStack(spacing: 8) {
+                Button(action: {
+                    // your back action
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20, weight: .medium))
+                        Text("Home")
+                            .font(.headline)
+                    }
+                    .foregroundColor(.black)
+                }
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 16)
             
             Spacer().frame(height: 20)
             
