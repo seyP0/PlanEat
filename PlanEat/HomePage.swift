@@ -10,7 +10,7 @@ struct HomePage: View {
             HeaderSection(userName: userName)
             SnackImageSection(snackText: snackRecommendation)
             NutrientSummary()
-            DatePickerSection(selectedDate: $selectedDate)
+            DynamicWeeklyCalendar()
             MealsSection()
             Spacer()
             BottomNavigationBar()
@@ -196,103 +196,365 @@ struct NutrientSummary: View {
 }
 
 
-struct DatePickerSection: View {
-    @Binding var selectedDate: Int
+struct DynamicWeeklyCalendar: View {
+    @State private var selectedDate = Date()
+    private let calendar = Calendar.current
+    private let today = Date()
 
-    var body: some View {
-        
-        ZStack {
-            Rectangle()
-                .frame(width: 350, height: 90)
-                .foregroundColor(.white)
-                .cornerRadius(20)
-            VStack(spacing: 8) {
-                Text("May 2025")
-                    .font(Font.custom("Baloo Bhaijaan 2", size: 20).weight(.bold))
-                    .foregroundColor(.black)
-                HStack(spacing: 20) {
-                    ForEach(2...8, id: \ .self) { day in
-                        VStack {
-                            Text(["S", "M", "T", "W", "T", "F", "S"][day - 2])
-                                .font(.caption)
-                            Text("0\(day)")
-                                .font(.headline)
-                                .padding(6)
-                                .background(selectedDate == day ? Color(red: 0.27, green: 0.45, blue: 0.54) : Color.clear)
-                                .foregroundColor(selectedDate == day ? .white : .primary)
-                                .clipShape(Circle())
-                        }.onTapGesture { selectedDate = day }
-                    }
-                }
-                
-            }.padding(.horizontal)
+    // MARK: — Formatters
+    private static let monthYearFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "MMMM yyyy"
+        return df
+    }()
+    private static let dayFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "dd"
+        return df
+    }()
+    private let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
+    // i.e. ["S","M","T","W","T","F","S"]
+
+    // MARK: — Computed Properties
+    /// “May 2025”
+    private var monthYearString: String {
+        DynamicWeeklyCalendar.monthYearFormatter.string(from: today)
+    }
+
+    /// The Sunday at the start of this week
+    private var startOfWeek: Date {
+        calendar.date(
+          from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
+        )!
+    }
+
+    /// Seven dates from Sunday through Saturday
+    private var weekDates: [Date] {
+        (0..<7).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: startOfWeek)
         }
     }
-}
-
-struct MealsSection: View {
-    var body: some View {
-        HStack(spacing: 16) {
-            MealCard(title: "Breakfast", items: ["A cup of milk", "Avocado Egg Toast"], imageName: "breakfast")
-            MealCard(title: "Lunch", items: ["Chicken Salad", "Whole Grain Bread"], imageName: "lunch")
-            MealCard(title: "Dinner", items: ["Grilled Salmon", "Roasted Vegetables"], imageName: "dinner")
-        }.padding(.horizontal)
-    }
-}
-
-struct MealCard: View {
-    var title: String
-    var items: [String]
-    var imageName: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.gray)
-            Text("400–450 kcal")
-                .font(.caption)
-                .foregroundColor(.gray)
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .cornerRadius(12)
-            ForEach(items, id: \.self) { item in
-                Text("• " + item)
-                    .font(.caption)
+        VStack(spacing: 4) {
+            // ◀︎ [Month Year] ▶︎
+            HStack {
+                Button { /* prev month */ } label: {
+                    Image(systemName: "chevron.left")
+                }
+                Spacer()
+                Text(monthYearString)
+                    .font(.custom("Baloo Bhaijaan 2", size: 16))
+                    .fontWeight(.semibold)
+                Spacer()
+                Button { /* next month */ } label: {
+                    Image(systemName: "chevron.right")
+                }
+            }
+            .font(.custom("Baloo Bhaijaan 2", size: 14))
+            .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
+
+            // Weekday initials
+            HStack(spacing: 0) {
+                ForEach(0..<7) { idx in
+                    Text(weekdaySymbols[idx])
+                        .frame(maxWidth: .infinity)
+                        .font(.custom("Baloo Bhaijaan 2", size: 14))
+                        .foregroundColor(.gray)
+                }
+            }
+
+            // Dates row
+            HStack(spacing: 0) {
+                ForEach(weekDates, id: \.self) { date in
+                    let dayString = DynamicWeeklyCalendar.dayFormatter.string(from: date)
+                    let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
+
+                    Button {
+                        selectedDate = date
+                    } label: {
+                        Text(dayString)
+                            .frame(maxWidth: .infinity, minHeight: 40)
+                            .font(.custom("Baloo Bhaijaan 2", size: 16))
+                            .fontWeight(.medium)
+                            .foregroundColor(isSelected ? .white : .primary)
+                            .background(
+                                ZStack {
+                                    if isSelected {
+                                        Circle()
+                                            .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
+                                            .frame(width: 40, height: 40)
+                                        Circle()
+                                            .stroke(Color(red: 0.43, green: 0.57, blue: 0.65),
+                                                    lineWidth: 2)
+                                            .frame(width: 40, height: 40)
+                                    }
+                                }
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(18)
-        .shadow(radius: 2)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 30)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.1),
+                        radius: 8, x: 0, y: 4)
+        )
+        .padding(.horizontal, 16)
     }
 }
+
+/// A model for one meal card.
+struct Meal: Identifiable {
+    let id = UUID()
+    let title: String
+    let caloriesRange: String
+    let items: [String]
+    let imageName: String?       // nil if you don’t have an image yet
+    var isFavorite: Bool = false
+}
+
+/// The horizontal scrolling section of meals.
+struct MealsSection: View {
+    @State private var meals: [Meal] = [
+        Meal(title: "Breakfast",
+             caloriesRange: "400–450 kcal",
+             items: ["A cup of milk", "Avocado Egg Toast"],
+             imageName: "breakfast"),
+        Meal(title: "Lunch",
+             caloriesRange: "400–450 kcal",
+             items: ["Chicken Salad", "Whole Grain Bread"],
+             imageName: "lunch"),
+        Meal(title: "Dinner",
+             caloriesRange: "400–450 kcal",
+             items: ["Grilled Salmon", "Roasted Vegetables"],
+             imageName: "dinner")
+    ]
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach($meals) { $meal in
+                    MealCard(
+                        title: meal.title,
+                        caloriesRange: meal.caloriesRange,
+                        items: meal.items,
+                        imageName: meal.imageName,
+                        isFavorite: $meal.isFavorite
+                    )
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+/// One individual meal card.
+struct MealCard: View {
+  let title: String
+  let caloriesRange: String
+  let items: [String]
+  let imageName: String?
+  @Binding var isFavorite: Bool
+
+  var body: some View {
+    VStack(spacing: 0) {
+      // 1) Header (≈ 40pt tall)
+    // — 1) Header (lifted up) —
+        VStack(alignment: .leading, spacing: 1) {
+            HStack {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                Spacer()
+                Button { isFavorite.toggle() } label: {
+                    Image(systemName: isFavorite ? "star.fill" : "star")
+                        .foregroundColor(isFavorite ? .yellow : .gray)
+                }
+                .buttonStyle(.plain)
+                .offset(y: 5)
+            }
+            .frame(height: 22)  // reserve exactly this much for the HStack
+
+            Text(caloriesRange)
+                .font(.caption)
+                .foregroundColor(.gray)
+                .padding(.top, -2) // lift it up closer to the title
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)   // much less breathing room
+        .frame(height: 45)       // total header is now only 32pts high
+        .background(Color.white)
+
+
+      // 2) Image (flexible up to 80pt)
+      if let name = imageName {
+        Image(name)
+          .resizable()
+          .scaledToFill()
+          .frame(height: 80)
+          .clipped()
+      } else {
+        Rectangle()
+          .fill(Color.gray.opacity(0.2))
+          .frame(height: 80)
+      }
+
+      // 3) Footer (≈ 80pt tall)
+      VStack(alignment: .leading, spacing: 4) {
+        ForEach(items, id: \.self) { item in
+          Text("• \(item)")
+            .font(.caption)
+            .foregroundColor(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+        }
+      }
+      .padding(8)
+      .frame(maxWidth: .infinity)
+      .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+      .frame(height: 50)
+    }
+    .overlay(
+             // border around entire card
+             RoundedRectangle(cornerRadius: 18)
+                 .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+         )
+         .background(
+             // make sure clipped to rounded corners
+             RoundedRectangle(cornerRadius: 18)
+                 .fill(Color.clear)
+         )
+         .cornerRadius(18)
+         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+         .frame(width: 160)
+  }
+}
+
 
 struct BottomNavigationBar: View {
     var body: some View {
-        HStack {
-            Spacer()
-            Image(systemName: "house.fill")
-            Spacer()
-            Image(systemName: "calendar")
-            Spacer()
-            Image(systemName: "star")
-            Spacer()
-            Image(systemName: "chart.bar")
-            Spacer()
+        ZStack {
+            // Background shape with notch
+            CustomTabBarShape()
+                .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
+                .frame(height: 90)
+                .edgesIgnoringSafeArea(.bottom)
+
+            HStack(spacing: 0) {
+                // HOME — centered under circle
+                VStack {
+                    Spacer()
+                    Image(systemName: "house.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+                // CALENDAR
+                VStack {
+                    Spacer()
+                    Image(systemName: "calendar")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+                // STAR
+                VStack {
+                    Spacer()
+                    Image(systemName: "star")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+                // PERSON
+                VStack {
+                    Spacer()
+                    Image(systemName: "person")
+                        .foregroundColor(.white)
+                        .font(.system(size: 25))
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal, 20)
+
+            // Floating circle (active tab)
+            Circle()
+                .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
+                .frame(width: 95, height: 95)
+                .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
+                .overlay(
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 25))
+                        .foregroundColor(.white)
+                )
+                .offset(x: -UIScreen.main.bounds.width / 2 + 67, y: -25)
         }
-        .padding()
-        .background(Color(red: 0.89, green: 0.96, blue: 0.97))
-        .clipShape(RoundedRectangle(cornerRadius: 30))
-        .shadow(radius: 2)
+        .frame(height: 90)
     }
 }
+
+
+
+
+struct CustomTabBarShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+
+        let width = rect.width
+        let height = rect.height + 40
+        let cornerRadius: CGFloat = 0
+        let notchRadius: CGFloat = 55
+        let centerX = width / 2 - 130
+        let notchDepth: CGFloat = 20
+
+        path.move(to: CGPoint(x: 0, y: height))
+        path.addLine(to: CGPoint(x: 0, y: cornerRadius))
+        path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
+        
+        // Left edge before notch
+        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
+        path.addQuadCurve(
+            to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
+            control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
+        )
+        
+        
+        path.addArc(
+            center: CGPoint(x: centerX, y: notchDepth),
+            radius: notchRadius,
+            startAngle: .degrees(180),
+            endAngle: .degrees(0),
+            clockwise: true
+        )
+        
+        path.addQuadCurve(
+            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
+            control: CGPoint(x: centerX + notchRadius + 1, y: 0)
+        )
+        path.addLine(to: CGPoint(x: width - 16, y: 0))
+        path.addQuadCurve(to: CGPoint(x: width, y: 16), control: CGPoint(x: width, y: 0))
+        path.addLine(to: CGPoint(x: width, y: height))
+        path.closeSubpath()
+
+        return path
+    }
+}
+
 
 struct HomePage_previews: PreviewProvider {
     static var previews: some View {
         HomePage()
     }
 }
-
 
