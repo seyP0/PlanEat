@@ -1,7 +1,9 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct HomePage: View {
-    @State private var userName = "Jonathan Lee"
+    @State private var userName = ""
     @State private var snackRecommendation = "Try Greek Berries Yogurt!"
     @State private var selectedDate = 5
 
@@ -18,6 +20,30 @@ struct HomePage: View {
         .padding(.top)
         .background(.white)
         .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            fetchUserName()
+        }
+    }
+    func fetchUserName() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("No user logged in.")
+            return
+        }
+
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { document, error in
+            if let error = error {
+                print("Error fetching user: \(error.localizedDescription)")
+                return
+            }
+
+            if let document = document, document.exists {
+                let data = document.data()
+                self.userName = data?["name"] as? String ?? "User"
+            } else {
+                print("User document does not exist.")
+            }
+        }
     }
 }
 
@@ -57,9 +83,9 @@ struct HeaderSection: View {
         .background(.white)
         .cornerRadius(30)
         .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 4)
-        
+
     }
-    
+
 }
 
 
@@ -94,7 +120,7 @@ struct SnackImageSection: View {
                 Image("smile-2")
                     .resizable()
                     .frame(width: 65, height: 65)
-                
+
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
@@ -180,7 +206,7 @@ struct NutrientSummary: View {
                             .font(Font.custom("Baloo Bhaijaan 2", size: 20).weight(.bold))
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity, maxHeight: 20, alignment: .init(horizontal: .center, vertical: .bottom))
-                        
+
                         Text("\nkcal")
                             .foregroundColor(.white)
                             .font(Font.custom("Baloo Bhaijaan 2", size: 15))
@@ -521,15 +547,15 @@ struct CustomTabBarShape: Shape {
         path.move(to: CGPoint(x: 0, y: height))
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
-        
+
         // Left edge before notch
         path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
         path.addQuadCurve(
             to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
             control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
         )
-        
-        
+
+
         path.addArc(
             center: CGPoint(x: centerX, y: notchDepth),
             radius: notchRadius,
@@ -537,7 +563,7 @@ struct CustomTabBarShape: Shape {
             endAngle: .degrees(0),
             clockwise: true
         )
-        
+
         path.addQuadCurve(
             to: CGPoint(x: centerX + notchRadius + 30, y: 0),
             control: CGPoint(x: centerX + notchRadius + 1, y: 0)
