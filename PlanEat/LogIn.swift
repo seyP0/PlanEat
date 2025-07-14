@@ -45,6 +45,7 @@ struct LogIn: View {
                     EmptyView()
                 }
 
+
                 // Sign In Button
                 Button(action: {
                     Auth.auth().signIn(withEmail: email, password: password) { result, error in
@@ -68,7 +69,7 @@ struct LogIn: View {
                         .shadow(color: .black.opacity(0.25), radius: 5, x: 0, y: 4)
                 }
                 .padding(.horizontal, 50)
-
+            
                 // OR Divider
                 HStack {
                     Rectangle().frame(width: 70, height: 1).foregroundColor(.black)
@@ -122,24 +123,31 @@ struct LogIn: View {
                         NavigationLink(destination: SignUp()) {
                             Text("Sign Up")
                                 .font(Font.custom("ABeeZee", size: 10))
-                                .underline()
+                                .underline(true, pattern: .solid)
+                                .multilineTextAlignment(.center)
                                 .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
-                                
+                                .frame(width: 40, height: 19, alignment: .top)
+                                .offset(x: -3)
                         }
-                    }
 
-                    Button(action: {
-                        // Handle forgot password
-                    }) {
-                        Text("Forgot Password?")
-                            .font(Font.custom("ABeeZee", size: 10))
-                            .underline()
-                            .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
-                    }
-                }
 
-                Spacer()
-            }
+                                        }
+
+
+                                        NavigationLink(destination: ForgotPasswordView()) {
+                                            Text("Forgot Password?")
+                                                .font(Font.custom("ABeeZee", size: 10))
+                                                .underline()
+                                                .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
+                                        }
+
+                                
+                                    }
+                                    .padding(.top, 8)
+
+                                    Spacer()
+                                }
+                                
             .padding(.top)
             .background(
                 RoundedCorner(radius: 900, corners: [.topLeft, .topRight])
