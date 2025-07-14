@@ -26,7 +26,7 @@ struct MoodPopupView: View {
 
                 // Mood Faces (interactive + disabled state on selection)
                 HStack(spacing: 16) {
-                    MoodFaceButton(name: "Happy", imageName: "smile", selectedImageName: "smile 1", isSelected: selectedMoodFace == "Happy") {
+                    MoodFaceButton(name: "Happy", imageName: "smile", selectedImageName: "smile 10", isSelected: selectedMoodFace == "Happy") {
                         selectedMoodFace = "Happy"
                     }
                     MoodFaceButton(name: "Neutral", imageName: "smile-3", selectedImageName: "smile-21", isSelected: selectedMoodFace == "Neutral") {
