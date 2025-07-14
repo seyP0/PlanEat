@@ -8,10 +8,11 @@ struct SignUp: View {
     @State private var email = ""
     @State private var password = ""
     @State private var dob = Date()
-
     @State private var selectedGender = ""
     @State private var selectedGoal = ""
     @State private var selectedCondition = ""
+    @State private var signUpSuccess = false // <-- Added
+    @State private var signUpError: String? = nil // Optional: for error feedback
 
     let genders = ["Male", "Female", "Other"]
     let goals = ["Weight Loss", "Muscle Gain", "Maintenance", "Detox"]
@@ -27,8 +28,7 @@ struct SignUp: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Date of Birth")
                         .font(.custom("Baloo Bhaijaan 2", size: 14))
-                        .padding(.leading, 8) // Adjust value (e.g., 8, 12) as needed
-
+                        .padding(.leading, 8)
                     HStack {
                         DatePicker("", selection: $dob, displayedComponents: .date)
                             .labelsHidden()
@@ -42,42 +42,44 @@ struct SignUp: View {
                     .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 4)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20) // Or match padding with your other fields
-                
+                .padding(.horizontal, 20)
             }
-     
+
             CustomPicker(label: "Gender", selection: $selectedGender, options: genders)
             CustomPicker(label: "Goal", selection: $selectedGoal, options: goals)
             CustomPicker(label: "Special Condition", selection: $selectedCondition, options: conditions)
 
-                Button(action: {
-    Auth.auth().createUser(withEmail: email, password: password) { result, error in
-        if let error = error {
-            print("Sign Up failed:", error.localizedDescription)
-        } else if let result = result {
-            print("Sign Up success! UID:", result.user.uid)
-
-            let db = Firestore.firestore()
-            db.collection("users").document(result.user.uid).setData([
-                "name": name,
-                "email": email,
-                "dob": Timestamp(date: dob),
-                "gender": selectedGender,
-                "goal": selectedGoal,
-                "condition": selectedCondition,
-                "createdAt": Timestamp()
-            ]) { err in
-                if let err = err {
-                    print("Error saving user profile:", err.localizedDescription)
-                } else {
-                    print("User profile saved to Firestore!")
+            Button(action: {
+                Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                    if let error = error {
+                        print("Sign Up failed:", error.localizedDescription)
+                        signUpError = error.localizedDescription // <-- Added
+                        signUpSuccess = false // <-- Added
+                    } else if let result = result {
+                        print("Sign Up success! UID:", result.user.uid)
+                        let db = Firestore.firestore()
+                        db.collection("users").document(result.user.uid).setData([
+                            "name": name,
+                            "email": email,
+                            "dob": Timestamp(date: dob),
+                            "gender": selectedGender,
+                            "goal": selectedGoal,
+                            "condition": selectedCondition,
+                            "createdAt": Timestamp()
+                        ]) { err in
+                            if let err = err {
+                                print("Error saving user profile:", err.localizedDescription)
+                                signUpError = err.localizedDescription // <-- Added
+                                signUpSuccess = false // <-- Added
+                            } else {
+                                print("User profile saved to Firestore!")
+                                signUpSuccess = true // <-- Added
+                                signUpError = nil // <-- Added
+                            }
+                        }
+                    }
                 }
-            }
-        }
-    }
-})
-
- {
+            }) {
                 Text("Create")
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .padding()
@@ -88,11 +90,25 @@ struct SignUp: View {
                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
             }
             .padding(.top, 20)
+
+            // Show success or error message below the button
+            if signUpSuccess {
+                Text("Your account has been successfully created!")
+                    .foregroundColor(.green)
+                    .font(.custom("Baloo Bhaijaan 2", size: 16))
+                    .padding(.top, 8)
+            } else if let error = signUpError {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.custom("Baloo Bhaijaan 2", size: 14))
+                    .padding(.top, 8)
+            }
         }
         .padding()
         .background(Color(red: 0.89, green: 0.96, blue: 0.97).ignoresSafeArea())
     }
 }
+
 struct CustomTextField: View {
     var label: String
     @Binding var text: String
@@ -160,11 +176,3 @@ struct CustomPicker: View {
         .padding(.horizontal, 20) // Or match padding with your other fields
     }
 }
-
-struct SignUp_Previews: PreviewProvider {
-    static var previews: some View {
-        SignUp()
-            .previewDevice("iPhone 16")
-    }
-}
-
