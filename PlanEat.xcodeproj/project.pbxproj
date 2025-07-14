@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		EE16BFF12DF66EFB00828FE7 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = EE16BFF02DF66EFB00828FE7 /* FirebaseAuth */; };
 		EE16BFF32DF66EFB00828FE7 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = EE16BFF22DF66EFB00828FE7 /* FirebaseCore */; };
-		EE81F4562E11F2E4003CE5B2 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = EE81F4552E11F2E4003CE5B2 /* FirebaseFirestore */; };
+		EEC7C6F22E1B110500547DB6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = EEC7C6F12E1B110500547DB6 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,7 +73,7 @@
 			files = (
 				EE16BFF32DF66EFB00828FE7 /* FirebaseCore in Frameworks */,
 				EE16BFF12DF66EFB00828FE7 /* FirebaseAuth in Frameworks */,
-				EE81F4562E11F2E4003CE5B2 /* FirebaseFirestore in Frameworks */,
+				EEC7C6F22E1B110500547DB6 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,7 +137,7 @@
 			packageProductDependencies = (
 				EE16BFF02DF66EFB00828FE7 /* FirebaseAuth */,
 				EE16BFF22DF66EFB00828FE7 /* FirebaseCore */,
-				EE81F4552E11F2E4003CE5B2 /* FirebaseFirestore */,
+				EEC7C6F12E1B110500547DB6 /* FirebaseFirestore */,
 			);
 			productName = PlanEat;
 			productReference = EE9C52ED2DED165C002A06E4 /* PlanEat.app */;
@@ -612,7 +612,7 @@
 			package = EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
 		};
-		EE81F4552E11F2E4003CE5B2 /* FirebaseFirestore */ = {
+		EEC7C6F12E1B110500547DB6 /* FirebaseFirestore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EE16BFEF2DF66EFB00828FE7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
