@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProfileView: View {
+struct EditProfile: View {
     @State private var name: String = "--"
     @State private var dateOfBirth: Date = Calendar.current.date(from: DateComponents(year: 2000, month: 4, day: 25)) ?? Date()
     @State private var goal: String = "---"
@@ -12,21 +12,7 @@ struct ProfileView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 30) {
-                // Navigation Bar
-                HStack(spacing: 8) {
-                    Button(action: {}) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.black)
-                    }
-                    Text("Profile")
-                        .font(.system(size: 18, weight: .regular))
-                        .foregroundColor(.black)
-                    Spacer()
-                }
-                .padding(.top, 30)
-                .padding(.horizontal, 60)
-                .padding(.bottom, 0)
+                
                 
                 Spacer() // Top Spacer for vertical centering
 
@@ -137,7 +123,7 @@ struct ProfileView: View {
                 }
                 
                 Spacer() // Bottom Spacer for vertical centering
-                .padding(.top, 30)
+                .padding(.top, 50)
 
             }
             
@@ -241,7 +227,7 @@ struct CustomToolBar: Shape {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView()
+        EditProfile()
     }
 }
 
