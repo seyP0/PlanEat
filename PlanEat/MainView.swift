@@ -7,7 +7,6 @@ enum Tab {
 
 struct MainView: View {
     @State private var selectedTab: Tab = .home
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,11 +21,10 @@ struct MainView: View {
                 case .profile:
                     VStack {
                         Text("Profile Page")
-
                         Button("Sign Out") {
                             do {
                                 try Auth.auth().signOut()
-                                dismiss()
+                                exit(0) // restart app to show LogIn
                             } catch {
                                 print("Error signing out: \(error.localizedDescription)")
                             }
@@ -38,7 +36,6 @@ struct MainView: View {
                     }
                 }
             }
-
             BottomNavigationBar(selectedTab: $selectedTab)
         }
     }

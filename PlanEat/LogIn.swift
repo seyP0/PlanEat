@@ -7,8 +7,6 @@ struct LogIn: View {
     @State private var isLoggedIn = false
 
     var body: some View {
-        NavigationStack {
-             {
                 VStack(spacing: 30) {
                     Spacer()
 
@@ -142,6 +140,7 @@ struct LogIn: View {
 
                     Spacer()
                 }
+    }
                 .padding(.top)
                 .background(
                     RoundedCorner(radius: 900, corners: [.topLeft, .topRight])
@@ -151,9 +150,8 @@ struct LogIn: View {
                 )
                 .navigationBarHidden(true)
             }
-        }
-    }
-}
+
+
 
 struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
