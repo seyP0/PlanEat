@@ -1,13 +1,17 @@
 import SwiftUI
 
-struct MoodPopupView: View {
-    @State private var selectedMoodFace: String? = nil
-    @State private var selectedMoodLabel: String? = nil
+struct FirstPopUp: View {
+    @Binding var selectedMoodFace: String?
+    @Binding var selectedMoodLabel: String?
+    var onDismiss: () -> Void
+
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
+                .onTapGesture(perform: onDismiss)
+
 
             VStack(spacing: 16) {
                 Text("How’s your mood today?")
@@ -26,16 +30,16 @@ struct MoodPopupView: View {
 
                 // Mood Faces (interactive + disabled state on selection)
                 HStack(spacing: 16) {
-                    MoodFaceButton(name: "Happy", imageName: "smile", selectedImageName: "smile 10", isSelected: selectedMoodFace == "Happy") {
+                    MoodFaceButton(name: "Happy", imageName: "smile", selectedImageName: "smileFaded", isSelected: selectedMoodFace == "Happy") {
                         selectedMoodFace = "Happy"
                     }
-                    MoodFaceButton(name: "Neutral", imageName: "smile-3", selectedImageName: "smile-21", isSelected: selectedMoodFace == "Neutral") {
+                    MoodFaceButton(name: "Neutral", imageName: "neutral", selectedImageName: "neutralFaded", isSelected: selectedMoodFace == "Neutral") {
                         selectedMoodFace = "Neutral"
                     }
-                    MoodFaceButton(name: "Sad", imageName: "smile-1", selectedImageName: "smile-11", isSelected: selectedMoodFace == "Sad") {
+                    MoodFaceButton(name: "Sad", imageName: "sad", selectedImageName: "sadFaded", isSelected: selectedMoodFace == "Sad") {
                         selectedMoodFace = "Sad"
                     }
-                    MoodFaceButton(name: "Angry", imageName: "smile 4", selectedImageName: "smile-2", isSelected: selectedMoodFace == "Angry") {
+                    MoodFaceButton(name: "Angry", imageName: "angry", selectedImageName: "angryFaded", isSelected: selectedMoodFace == "Angry") {
                         selectedMoodFace = "Angry"
                     }
                 }
@@ -45,26 +49,26 @@ struct MoodPopupView: View {
                 // Mood Buttons (with selection and hover state)
                 VStack(spacing: 15) {
                     HStack(spacing: 16) {
-                        MoodButton(label: "Drained", isSelected: selectedMoodLabel == "Drained") {
+                        MoodLabelButton(label: "Drained", isSelected: selectedMoodLabel == "Drained") {
                             selectedMoodLabel = "Drained"
                         }
-                        MoodButton(label: "Heavy", isSelected: selectedMoodLabel == "Heavy") {
+                        MoodLabelButton(label: "Heavy", isSelected: selectedMoodLabel == "Heavy") {
                             selectedMoodLabel = "Heavy"
                         }
                     }
                     HStack(spacing: 16) {
-                        MoodButton(label: "Irritated", isSelected: selectedMoodLabel == "Irritated") {
+                        MoodLabelButton(label: "Irritated", isSelected: selectedMoodLabel == "Irritated") {
                             selectedMoodLabel = "Irritated"
                         }
-                        MoodButton(label: "Down", isSelected: selectedMoodLabel == "Down") {
+                        MoodLabelButton(label: "Down", isSelected: selectedMoodLabel == "Down") {
                             selectedMoodLabel = "Down"
                         }
                     }
                     HStack(spacing: 16) {
-                        MoodButton(label: "Bloated", isSelected: selectedMoodLabel == "Bloated") {
+                        MoodLabelButton(label: "Bloated", isSelected: selectedMoodLabel == "Bloated") {
                             selectedMoodLabel = "Bloated"
                         }
-                        MoodButton(label: "Foggy", isSelected: selectedMoodLabel == "Foggy") {
+                        MoodLabelButton(label: "Foggy", isSelected: selectedMoodLabel == "Foggy") {
                             selectedMoodLabel = "Foggy"
                         }
                     }
@@ -101,7 +105,7 @@ struct MoodFaceButton: View {
 }
 
 // MARK: - Mood Label Button (Selectable + Hover)
-struct MoodButton: View {
+struct MoodLabelButton: View {
     let label: String
     var isSelected: Bool
     var action: () -> Void
@@ -136,11 +140,11 @@ struct MoodButton: View {
     }
 }
 
-struct MoodPopupView_Previews: PreviewProvider {
-    static var previews: some View {
-        MoodPopupView()
-            .previewLayout(.sizeThatFits)
-    }
-
-    
-}
+//struct FirstPopUp_Previews: PreviewProvider {
+//    static var previews: some View {
+//        FirstPopUp(onDismiss: {})
+//            .previewLayout(.sizeThatFits)
+//    }
+//
+//    
+//}

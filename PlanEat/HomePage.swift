@@ -6,22 +6,57 @@ struct HomePage: View {
     @State private var userName = ""
     @State private var snackRecommendation = "Try Greek Berries Yogurt!"
     @State private var selectedDate = 5
+    @State private var showMoodPopup = false
+    
+/// what face did they pick?
+    @State private var selectedMoodFace: String? = nil
+    @State private var selectedMoodLabel: String? = nil  // ← add this
+
+    /// Map the selection to your actual asset name
+    private var moodImageName: String {
+        switch selectedMoodFace {
+        case "Happy":   return "smile"
+        case "Neutral": return "neutral"
+        case "Sad":     return "sad"
+        case "Angry":   return "angry"
+        default:        return "smile"  // your default fallback
+        }
+    }
+
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HeaderSection(userName: userName)
-            SnackImageSection(snackText: snackRecommendation)
-            NutrientSummary()
-            DynamicWeeklyCalendar()
-            MealsSection()
-            Spacer()
-            BottomNavigationBar()
-        }
-        .padding(.top)
-        .background(.white)
-        .ignoresSafeArea(edges: .bottom)
-        .onAppear {
-            fetchUserName()
+        ZStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HeaderSection(userName: userName)
+                SnackImageSection(snackText: snackRecommendation,  emojiImageName: moodImageName) {
+                    // when emoji tapped:
+                    withAnimation { showMoodPopup = true }
+                }
+                NutrientSummary()
+                DynamicWeeklyCalendar()
+                MealsSection()
+                Spacer()
+                BottomNavigationBar()
+            }
+            .padding(.top)
+            .background(.white)
+            .ignoresSafeArea(edges: .bottom)
+            .onAppear(perform: fetchUserName)
+            
+            // MARK: — Mood Pop-up Overlay
+            if showMoodPopup {
+                FirstPopUp(
+                  selectedMoodFace: $selectedMoodFace,
+                  selectedMoodLabel: $selectedMoodLabel,
+                  onDismiss:
+                 {
+                    // dismiss action
+                    withAnimation {
+                        showMoodPopup = false
+                    }
+                 }
+                )
+            }
         }
     }
     func fetchUserName() {
@@ -50,9 +85,10 @@ struct HomePage: View {
 struct HeaderSection: View {
     let userName: String
 
+
     var body: some View {
         HStack {
-            Image("smile 10")
+            Image("smile")
                 .resizable()
                 .frame(width: 60, height: 60)
                 .clipShape(Circle())
@@ -105,6 +141,10 @@ struct BubbleTail: Shape {
 
 struct SnackImageSection: View {
     var snackText: String
+    let emojiImageName: String          // ← new argument
+
+    var onEmojiTap: () -> Void
+
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -116,10 +156,16 @@ struct SnackImageSection: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(red: 0.51, green: 0.6, blue: 0.62))
                 .frame(width: 179, height: 22, alignment: .top)
+            
+            
             HStack(alignment: .center, spacing: 10) {
-                Image("smile-2")
-                    .resizable()
-                    .frame(width: 65, height: 65)
+                // tappable mood emoji
+                Button(action: onEmojiTap) {
+                    Image(emojiImageName)       // or the current selected emoji
+                        .resizable()
+                        .frame(width: 65, height: 65)
+                }
+                .buttonStyle(PlainButtonStyle())
 
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 20)
@@ -399,6 +445,7 @@ struct MealCard: View {
                 Spacer()
                 Button { isFavorite.toggle() } label: {
                     Image(systemName: isFavorite ? "star.fill" : "star")
+                        .symbolRenderingMode(.monochrome)      // force template mode
                         .foregroundColor(isFavorite ? .yellow : .gray)
                 }
                 .buttonStyle(.plain)
@@ -524,7 +571,7 @@ struct BottomNavigationBar: View {
                         .font(.system(size: 25))
                         .foregroundColor(.white)
                 )
-                .offset(x: -UIScreen.main.bounds.width / 2 + 67, y: -25)
+                .offset(x: -UIScreen.main.bounds.width / 2 + 66, y: -27)
         }
         .frame(height: 90)
     }

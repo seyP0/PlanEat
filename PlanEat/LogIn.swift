@@ -7,7 +7,7 @@ struct LogIn: View {
     @State private var isLoggedIn = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 30) {
                 Spacer()
 
@@ -39,15 +39,15 @@ struct LogIn: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 50)
-
-                // Navigation to HomePage after login
-                NavigationLink(destination: HomePage(), isActive: $isLoggedIn) {
-                    EmptyView()
-                }
+//
+//                // Navigation to HomePage after login
+//                NavigationLink(destination: HomePage(), isActive: $isLoggedIn) {
+//                    EmptyView()
+//                }
 
 
                 // Sign In Button
-                Button(action: {
+                Button {
                     Auth.auth().signIn(withEmail: email, password: password) { result, error in
                         if let error = error {
                             print("Login failed:", error.localizedDescription)
@@ -56,7 +56,7 @@ struct LogIn: View {
                             isLoggedIn = true
                         }
                     }
-                }) {
+                } label: {
                     Text("Sign In")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -82,7 +82,7 @@ struct LogIn: View {
 
                 // Social Buttons
                 HStack(spacing: 24) {
-                    Button(action: {}) {
+                    Button{} label: {
                         ZStack {
                             Rectangle()
                                 .frame(width: 64, height: 64)
@@ -97,7 +97,7 @@ struct LogIn: View {
                         }
                     }
 
-                    Button(action: {}) {
+                    Button{} label: {
                         ZStack {
                             Rectangle()
                                 .frame(width: 64, height: 64)
@@ -131,22 +131,22 @@ struct LogIn: View {
                         }
 
 
-                                        }
+                    }
 
 
-                                        NavigationLink(destination: ForgotPasswordView()) {
-                                            Text("Forgot Password?")
-                                                .font(Font.custom("ABeeZee", size: 10))
-                                                .underline()
-                                                .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
-                                        }
+                    NavigationLink(destination: ForgotPasswordView()) {
+                        Text("Forgot Password?")
+                            .font(Font.custom("ABeeZee", size: 10))
+                            .underline()
+                            .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
+                    }
 
                                 
-                                    }
-                                    .padding(.top, 8)
+                }
+                .padding(.top, 8)
 
-                                    Spacer()
-                                }
+                Spacer()
+            }
                                 
             .padding(.top)
             .background(
@@ -156,6 +156,9 @@ struct LogIn: View {
                     .offset(y: 200)
             )
             .navigationBarHidden(true)
+            .navigationDestination(isPresented: $isLoggedIn) {
+                HomePage()
+            }
         }
     }
 }
