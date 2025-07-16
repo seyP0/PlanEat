@@ -15,7 +15,6 @@ struct HomePage: View {
             DynamicWeeklyCalendar()
             MealsSection()
             Spacer()
-            BottomNavigationBar()
         }
         .padding(.top)
         .background(.white)
