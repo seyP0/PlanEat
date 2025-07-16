@@ -33,16 +33,18 @@ struct BottomNavigationBar: View {
         .frame(height: 90)
     }
 
-    var selectedTabIcon: String {
+    var circleOffset: CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        let sectionWidth = screenWidth / 4
         switch selectedTab {
-        case .home: return "house.fill"
-        case .calendar: return "calendar"
-        case .favorites: return "star"
-        case .profile: return "person"
+            case .home: return -screenWidth/2 + sectionWidth/2
+            case .calendar: return -screenWidth/2 + sectionWidth * 1.5
+            case .favorites: return -screenWidth/2 + sectionWidth * 2.5
+            case .profile: return -screenWidth/2 + sectionWidth * 3.5
         }
     }
 
-    func TabButton(icon: String, tab: Tab) -> some View {
+    func TabButton(icon: String, tab: Tab, index: Int) -> some View {
         VStack {
             Spacer()
             Button {
