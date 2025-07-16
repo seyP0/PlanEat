@@ -19,16 +19,15 @@ struct BottomNavigationBar: View {
             .padding(.horizontal, 20)
 
             Circle()
-    .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
-    .frame(width: 95, height: 95)
-    .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
-    .overlay(
-        Image(systemName: selectedTabIcon)
-            .font(.system(size: 25))
-            .foregroundColor(.white)
-    )
-    .offset(x: -UIScreen.main.bounds.width / 2 + 67, y: -25)
-
+                .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
+                .frame(width: 95, height: 95)
+                .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
+                .overlay(
+                    Image(systemName: selectedTabIcon)
+                        .font(.system(size: 25))
+                        .foregroundColor(.white)
+                )
+                .offset(x: circleOffset, y: -25)
         }
         .frame(height: 90)
     }
