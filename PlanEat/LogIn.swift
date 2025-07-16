@@ -39,22 +39,14 @@ struct LogIn: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 50)
 
-                    // Navigation to MainView after login
-                    NavigationLink(destination: MainView(), isActive: $isLoggedIn) {
-                        EmptyView()
-                    }
-
                     // Sign In Button
                     Button(action: {
-                        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-                            if let error = error {
-                                print("Login failed:", error.localizedDescription)
-                            } else {
-                                print("Login success! UID:", result?.user.uid ?? "")
-                                isLoggedIn = true
-                            }
+                    Auth.auth().signIn(withEmail: email, password: password) { result, error in
+                        if error == nil {
+                            isLoggedIn = true
                         }
-                    }) {
+                    }
+                }) {
                         Text("Sign In")
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -67,6 +59,11 @@ struct LogIn: View {
                             .shadow(color: .black.opacity(0.25), radius: 5, x: 0, y: 4)
                     }
                     .padding(.horizontal, 50)
+
+                    // Navigation to MainView after login
+                    NavigationLink(destination: MainView(), isActive: $isLoggedIn) {
+                        EmptyView()
+                    }
 
                     // OR Divider
                     HStack {

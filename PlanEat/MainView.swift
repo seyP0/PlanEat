@@ -22,17 +22,10 @@ struct MainView: View {
                     VStack {
                         Text("Profile Page")
                         Button("Sign Out") {
-                            do {
-                                try Auth.auth().signOut()
-                                exit(0) // restart app to show LogIn
-                            } catch {
-                                print("Error signing out: \(error.localizedDescription)")
-                            }
+                            try? Auth.auth().signOut()
+                            exit(0)
                         }
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .padding().background(.red).foregroundColor(.white).cornerRadius(8)
                     }
                 }
             }
