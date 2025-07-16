@@ -65,14 +65,13 @@ struct SettingsView: View {
             .padding(.top, -60)
             
             // MARK: – Menu Buttons
-            VStack(spacing: 20) {
+            VStack(spacing: 25) {
                 MenuButton(icon: "pencil", title: "Edit Profile")
-                MenuButton(icon: "lock", title: "Password")
                 MenuButton(icon: "globe", title: "Language")
                 MenuButton(icon: "questionmark.circle", title: "Support")
                 MenuButton(icon: "arrow.forward.square", title: "Sign Out")
             }
-            .padding(.top, 50)
+            .padding(.top, 70)
             .padding(.horizontal)
             .padding(.bottom, 40)
             
@@ -82,7 +81,7 @@ struct SettingsView: View {
             ZStack {
                 CustomTab()
                     .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
-                    .frame(width: 480, height: 80)
+                    .frame(width: 480, height: 90)
                     .edgesIgnoringSafeArea(.bottom)
                 
                 HStack {
@@ -121,6 +120,7 @@ struct SettingsView: View {
                     Spacer()
                 }
             }
+            .padding(.bottom, -17)
         }
         .background(Color.white)
     }
