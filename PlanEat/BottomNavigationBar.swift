@@ -23,27 +23,39 @@ struct BottomNavigationBar: View {
                 .frame(width: 95, height: 95)
                 .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
                 .overlay(
-                    Image(systemName: selectedTabIcon)
+                    Image(systemName: iconForTab(selectedTab))
                         .font(.system(size: 25))
                         .foregroundColor(.white)
                 )
-                .offset(x: circleOffset, y: -25)
+                .offset(x: circleOffset(for: selectedTab), y: -25)
         }
         .frame(height: 90)
     }
 
-    var circleOffset: CGFloat {
-        let screenWidth = UIScreen.main.bounds.width
-        let sectionWidth = screenWidth / 4
-        switch selectedTab {
-            case .home: return -screenWidth/2 + sectionWidth/2
-            case .calendar: return -screenWidth/2 + sectionWidth * 1.5
-            case .favorites: return -screenWidth/2 + sectionWidth * 2.5
-            case .profile: return -screenWidth/2 + sectionWidth * 3.5
+    // Returns the icon name for a given tab
+    func iconForTab(_ tab: Tab) -> String {
+        switch tab {
+        case .home: return "house.fill"
+        case .calendar: return "calendar"
+        case .favorites: return "star"
+        case .profile: return "person"
         }
     }
 
-    func TabButton(icon: String, tab: Tab, index: Int) -> some View {
+    // Computes the circle position based on the selected tab
+    func circleOffset(for tab: Tab) -> CGFloat {
+        let screenWidth = UIScreen.main.bounds.width
+        let sectionWidth = screenWidth / 4
+        switch tab {
+        case .home: return -screenWidth/2 + sectionWidth/2
+        case .calendar: return -screenWidth/2 + sectionWidth * 1.5
+        case .favorites: return -screenWidth/2 + sectionWidth * 2.5
+        case .profile: return -screenWidth/2 + sectionWidth * 3.5
+        }
+    }
+
+    // A single tab button
+    func TabButton(icon: String, tab: Tab) -> some View {
         VStack {
             Spacer()
             Button {
@@ -58,6 +70,7 @@ struct BottomNavigationBar: View {
         .frame(maxWidth: .infinity)
     }
 }
+
 
 struct CustomTabBarShape: Shape {
     func path(in rect: CGRect) -> Path {
