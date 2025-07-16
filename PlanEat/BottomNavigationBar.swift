@@ -1,11 +1,9 @@
-import SwiftUI
-
 struct BottomNavigationBar: View {
     @Binding var selectedTab: Tab
 
     var body: some View {
         ZStack {
-            CustomTabBarShape()
+            CustomTabBarShape(selectedTab: selectedTab)
                 .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                 .frame(height: 90)
                 .edgesIgnoringSafeArea(.bottom)
@@ -23,7 +21,7 @@ struct BottomNavigationBar: View {
                 .frame(width: 95, height: 95)
                 .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
                 .overlay(
-                    Image(systemName: iconForTab(selectedTab))
+                    Image(systemName: selectedTabIcon)
                         .font(.system(size: 25))
                         .foregroundColor(.white)
                 )
@@ -32,9 +30,8 @@ struct BottomNavigationBar: View {
         .frame(height: 90)
     }
 
-    // Returns the icon name for a given tab
-    func iconForTab(_ tab: Tab) -> String {
-        switch tab {
+    var selectedTabIcon: String {
+        switch selectedTab {
         case .home: return "house.fill"
         case .calendar: return "calendar"
         case .favorites: return "star"
@@ -42,19 +39,19 @@ struct BottomNavigationBar: View {
         }
     }
 
-    // Computes the circle position based on the selected tab
     func circleOffset(for tab: Tab) -> CGFloat {
-        let screenWidth = UIScreen.main.bounds.width
-        let sectionWidth = screenWidth / 4
+        let tabCount: CGFloat = 4
+        let spacing = UIScreen.main.bounds.width / tabCount
+        let tabIndex: CGFloat
         switch tab {
-        case .home: return -screenWidth/2 + sectionWidth/2
-        case .calendar: return -screenWidth/2 + sectionWidth * 1.5
-        case .favorites: return -screenWidth/2 + sectionWidth * 2.5
-        case .profile: return -screenWidth/2 + sectionWidth * 3.5
+        case .home: tabIndex = 0
+        case .calendar: tabIndex = 1
+        case .favorites: tabIndex = 2
+        case .profile: tabIndex = 3
         }
+        return -UIScreen.main.bounds.width / 2 + (spacing / 2) + (spacing * tabIndex)
     }
 
-    // A single tab button
     func TabButton(icon: String, tab: Tab) -> some View {
         VStack {
             Spacer()
@@ -72,7 +69,10 @@ struct BottomNavigationBar: View {
 }
 
 
+
 struct CustomTabBarShape: Shape {
+    var selectedTab: Tab
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
@@ -80,14 +80,25 @@ struct CustomTabBarShape: Shape {
         let height = rect.height + 40
         let cornerRadius: CGFloat = 0
         let notchRadius: CGFloat = 55
-        let centerX = width / 2 - 130
         let notchDepth: CGFloat = 20
+
+        // calculate centerX based on selected tab
+        let tabCount: CGFloat = 4
+        let spacing = width / tabCount
+        let tabIndex: CGFloat
+        switch selectedTab {
+        case .home: tabIndex = 0
+        case .calendar: tabIndex = 1
+        case .favorites: tabIndex = 2
+        case .profile: tabIndex = 3
+        }
+        let centerX = (spacing / 2) + (spacing * tabIndex)
 
         path.move(to: CGPoint(x: 0, y: height))
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
 
-        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
+        path.addLine(to: CGPoint(x: centerX - notchRadius - 10, y: 0))
         path.addQuadCurve(
             to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
             control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
@@ -102,14 +113,15 @@ struct CustomTabBarShape: Shape {
         )
 
         path.addQuadCurve(
-            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
+            to: CGPoint(x: centerX + notchRadius + 10, y: 0),
             control: CGPoint(x: centerX + notchRadius + 1, y: 0)
         )
-        path.addLine(to: CGPoint(x: width - 16, y: 0))
-        path.addQuadCurve(to: CGPoint(x: width, y: 16), control: CGPoint(x: width, y: 0))
+        path.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
+        path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius), control: CGPoint(x: width, y: 0))
         path.addLine(to: CGPoint(x: width, y: height))
         path.closeSubpath()
 
         return path
     }
 }
+
