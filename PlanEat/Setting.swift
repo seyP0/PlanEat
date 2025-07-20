@@ -1,7 +1,12 @@
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct SettingsView: View {
     @EnvironmentObject var session: SessionManager
+    @State private var displayName = ""
+    @State private var displayEmail = ""
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -47,13 +52,13 @@ struct SettingsView: View {
                 }
                 .padding(.top, 15)
 
-                Text("--")
+                Text(displayName)
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .padding(.top, 12)
 
-                Text("--")
+                Text(displayEmail)
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .padding(.bottom, 10)
@@ -81,9 +86,25 @@ struct SettingsView: View {
 
             Spacer()
 
-            
+
         }
         .background(Color.white)
+        .onAppear {
+            // load current user's email
+            if let user = Auth.auth().currentUser {
+                displayEmail = user.email ?? ""
+                // fetch the stored name from Firestore
+                Firestore.firestore()
+                    .collection("users")
+                    .document(user.uid)
+                    .getDocument { snapshot, error in
+                        if let data = snapshot?.data(),
+                           let name = data["name"] as? String {
+                            displayName = name
+                        }
+                    }
+            }
+        }
     }
 }
 
@@ -112,7 +133,7 @@ private struct MenuButton: View {
                     .foregroundColor(.white)
             }
             .padding()
-            .frame(width: 350) 
+            .frame(width: 350)
             .background(Color(red: 0.43, green: 0.57, blue: 0.65))
             .cornerRadius(12)
         }
