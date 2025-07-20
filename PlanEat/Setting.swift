@@ -21,7 +21,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 50)
-                
+
                 // Profile Image + Add Button
                 ZStack(alignment: .bottomTrailing) {
                     Circle()
@@ -31,7 +31,7 @@ struct SettingsView: View {
                             Circle()
                                 .stroke(Color(red: 0.84, green: 0.84, blue: 0.84), lineWidth: 1)
                         )
-                    
+
                     ZStack {
                         Circle()
                             .fill(Color.white)
@@ -44,13 +44,13 @@ struct SettingsView: View {
                     .offset(x: 6, y: 6)
                 }
                 .padding(.top, 15)
-                
+
                 Text("--")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .padding(.top, 12)
-                
+
                 Text("--")
                     .font(.subheadline)
                     .foregroundColor(.gray)
@@ -63,28 +63,30 @@ struct SettingsView: View {
             .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
             .padding(.horizontal)
             .padding(.top, -60)
-            
+
             // MARK: – Menu Buttons
             VStack(spacing: 20) {
                 MenuButton(icon: "pencil", title: "Edit Profile")
                 MenuButton(icon: "lock", title: "Password")
                 MenuButton(icon: "globe", title: "Language")
                 MenuButton(icon: "questionmark.circle", title: "Support")
-                MenuButton(icon: "arrow.forward.square", title: "Sign Out")
+                MenuButton(icon: "arrow.forward.square", title: "Sign Out") {
+    session.signOut()
+}
             }
             .padding(.top, 50)
             .padding(.horizontal)
             .padding(.bottom, 40)
-            
+
             Spacer()
-            
+
             // MARK: – Tab Bar
             ZStack {
                 CustomTab()
                     .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .frame(width: 480, height: 80)
                     .edgesIgnoringSafeArea(.bottom)
-                
+
                 HStack {
                     Spacer()
                     Image(systemName: "house")
@@ -92,14 +94,14 @@ struct SettingsView: View {
                         .foregroundColor(.white)
                         .offset(x: 10, y: 6)
                     Spacer()
-                    
+
                     ZStack {
                         Circle()
                             .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
                             .frame(width: 95, height: 95)
                             .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
                             .offset(x: 165, y: 15)
-                        
+
                         Image(systemName: "calendar")
                             .font(.system(size: 25))
                             .foregroundColor(.white)
@@ -107,13 +109,13 @@ struct SettingsView: View {
                     }
                     .offset(y: -40)
                     Spacer()
-                    
+
                     Image(systemName: "star")
                         .font(.system(size: 25))
                         .foregroundColor(.white)
                         .offset(x: -65, y: 6)
                     Spacer()
-                    
+
                     Image(systemName: "person")
                         .font(.system(size: 25))
                         .foregroundColor(.white)
@@ -129,20 +131,21 @@ struct SettingsView: View {
 private struct MenuButton: View {
     let icon: String
     let title: String
-    
+    var action: (() -> Void)?
+
     var body: some View {
         HStack {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .foregroundColor(.white)
                 .frame(width: 28)
-            
+
             Text(title)
                 .foregroundColor(.white)
                 .font(.headline)
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .foregroundColor(.white)
         }
@@ -155,24 +158,24 @@ private struct MenuButton: View {
 struct CustomTab: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        
+
         let width = rect.width
         let height = rect.height + 40
         let cornerRadius: CGFloat = 16
         let notchRadius: CGFloat = 65
         let centerX = width / 2 + 125
         let notchDepth: CGFloat = 20
-        
+
         path.move(to: CGPoint(x: 0, y: height))
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
-        
+
         path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
         path.addQuadCurve(
             to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
             control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
         )
-        
+
         path.addArc(
             center: CGPoint(x: centerX, y: notchDepth),
             radius: notchRadius,
@@ -180,17 +183,17 @@ struct CustomTab: Shape {
             endAngle: .degrees(0),
             clockwise: true
         )
-        
+
         path.addQuadCurve(
             to: CGPoint(x: centerX + notchRadius + 30, y: 0),
             control: CGPoint(x: centerX + notchRadius + 1, y: 0)
         )
         path.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
         path.addQuadCurve(to: CGPoint(x: width, y: cornerRadius), control: CGPoint(x: width, y: 0))
-        
+
         path.addLine(to: CGPoint(x: width, y: height))
         path.closeSubpath()
-        
+
         return path
     }
 }

@@ -6,6 +6,7 @@ enum Tab {
 }
 
 struct MainView: View {
+    @EnvironmentObject var session: SessionManager
     @State private var selectedTab: Tab = .home
 
     var body: some View {
@@ -22,10 +23,12 @@ struct MainView: View {
                     VStack {
                         Text("Profile Page")
                         Button("Sign Out") {
-                            try? Auth.auth().signOut()
-                            exit(0)
+                            session.signOut()
                         }
-                        .padding().background(.red).foregroundColor(.white).cornerRadius(8)
+                        .padding()
+                        .background(.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                     }
                 }
             }
