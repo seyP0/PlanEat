@@ -112,12 +112,11 @@ private struct MenuButton: View {
                     .foregroundColor(.white)
             }
             .padding()
+            .frame(width: 350) 
             .background(Color(red: 0.43, green: 0.57, blue: 0.65))
             .cornerRadius(12)
         }
-        .padding()
-        .background(Color(red: 0.43, green: 0.57, blue: 0.65))
-        .cornerRadius(12)
+
     }
 }
 
