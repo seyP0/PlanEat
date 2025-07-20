@@ -2,27 +2,24 @@ import SwiftUI
 import FirebaseAuth
 
 struct LoadingPG: View {
+    @EnvironmentObject var session: SessionManager
+
     @State private var isActive = false
     @State private var leftMouth = "mouthNeutral"
     @State private var rightMouth = "mouthNeutral"
-    @State private var isLoggedIn: Bool? = nil
 
     var body: some View {
         Group {
-            if let loggedIn = isLoggedIn {
-                if loggedIn {
-                    MainView()
-                } else {
-                    LogIn()
-                }
+            if session.isLoggedIn {
+                MainView()
             } else {
-                splashScreen
+                LogIn()
             }
         }
         .onAppear {
             animateMouths()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                isLoggedIn = Auth.auth().currentUser != nil
+                session.checkLogin()
             }
         }
     }

@@ -10,6 +10,8 @@ import Firebase
 
 @main
 struct PlanEatApp: App {
+    @StateObject var session = SessionManager()
+
     init() {
         FirebaseApp.configure()
     }
@@ -17,6 +19,7 @@ struct PlanEatApp: App {
     var body: some Scene {
         WindowGroup {
             LoadingPG()
+                .environmentObject(session)
         }
     }
 }

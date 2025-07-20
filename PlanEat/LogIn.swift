@@ -1,13 +1,10 @@
 import SwiftUI
 import FirebaseAuth
 
-import SwiftUI
-import FirebaseAuth
-
 struct LogIn: View {
+    @EnvironmentObject var session: SessionManager
     @State private var email = ""
     @State private var password = ""
-    @State private var isLoggedIn = false
 
     var body: some View {
         NavigationStack {
@@ -47,7 +44,7 @@ struct LogIn: View {
                             print("Login failed:", error.localizedDescription)
                         } else {
                             print("Login success! UID:", result?.user.uid ?? "")
-                            isLoggedIn = true
+                            session.isLoggedIn = true
                         }
                     }
                 }) {
@@ -140,15 +137,9 @@ struct LogIn: View {
                     .offset(y: 200)
             )
             .navigationBarHidden(true)
-            .navigationDestination(isPresented: $isLoggedIn) {
-                MainView()
-            }
         }
     }
 }
-
-
-
 
 struct RoundedCorner: Shape {
     var radius: CGFloat = .infinity
@@ -164,9 +155,3 @@ struct RoundedCorner: Shape {
     }
 }
 
-struct LogIn_Previews: PreviewProvider {
-    static var previews: some View {
-        LogIn()
-            .previewDevice("iPhone 16")
-    }
-}

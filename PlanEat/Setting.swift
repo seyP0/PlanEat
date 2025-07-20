@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var session: SessionManager
+
     var body: some View {
         VStack(spacing: 0) {
             // MARK: – Header Card
@@ -21,7 +23,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 50)
-                
+
                 // Profile Image + Add Button
                 ZStack(alignment: .bottomTrailing) {
                     Circle()
@@ -31,7 +33,7 @@ struct SettingsView: View {
                             Circle()
                                 .stroke(Color(red: 0.84, green: 0.84, blue: 0.84), lineWidth: 1)
                         )
-                    
+
                     ZStack {
                         Circle()
                             .fill(Color.white)
@@ -44,13 +46,13 @@ struct SettingsView: View {
                     .offset(x: 6, y: 6)
                 }
                 .padding(.top, 15)
-                
+
                 Text("--")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
                     .padding(.top, 12)
-                
+
                 Text("--")
                     .font(.subheadline)
                     .foregroundColor(.gray)
@@ -63,21 +65,24 @@ struct SettingsView: View {
             .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
             .padding(.horizontal)
             .padding(.top, -60)
-            
+
             // MARK: – Menu Buttons
             VStack(spacing: 20) {
                 MenuButton(icon: "pencil", title: "Edit Profile")
                 MenuButton(icon: "lock", title: "Password")
                 MenuButton(icon: "globe", title: "Language")
                 MenuButton(icon: "questionmark.circle", title: "Support")
-                MenuButton(icon: "arrow.forward.square", title: "Sign Out")
+                MenuButton(icon: "arrow.forward.square", title: "Sign Out") {
+    session.signOut()
+}
             }
             .padding(.top, 50)
             .padding(.horizontal)
             .padding(.bottom, 40)
-            
+
             Spacer()
-            
+
+ 
         }
         .background(Color.white)
     }
@@ -86,20 +91,21 @@ struct SettingsView: View {
 private struct MenuButton: View {
     let icon: String
     let title: String
-    
+    var action: (() -> Void)?
+
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .font(.custom("Baloo Bhaijaan 2", size: 20))
+                .font(.system(size: 20))
                 .foregroundColor(.white)
-                .frame(width: 20)
-            
+                .frame(width: 28)
+
             Text(title)
                 .foregroundColor(.white)
                 .font(.headline)
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .foregroundColor(.white)
         }

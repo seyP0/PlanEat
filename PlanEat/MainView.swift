@@ -6,6 +6,7 @@ enum Tab {
 }
 
 struct MainView: View {
+    @EnvironmentObject var session: SessionManager
     @State private var selectedTab: Tab = .home
 
     var body: some View {
