@@ -15,18 +15,11 @@ struct MainView: View {
                 case .home:
                     HomePage()
                 case .calendar:
-                    Text("Calendar Page")
+                    CalendarSmileView()
                 case .favorites:
-                    Text("Favorites Page")
+                    MealView()
                 case .profile:
-                    VStack {
-                        Text("Profile Page")
-                        Button("Sign Out") {
-                            try? Auth.auth().signOut()
-                            exit(0)
-                        }
-                        .padding().background(.red).foregroundColor(.white).cornerRadius(8)
-                    }
+                    SettingsView()
                 }
             }
             BottomNavigationBar(selectedTab: $selectedTab)

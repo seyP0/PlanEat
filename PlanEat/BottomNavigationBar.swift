@@ -1,3 +1,5 @@
+import SwiftUI
+
 struct BottomNavigationBar: View {
     @Binding var selectedTab: Tab
 
@@ -18,14 +20,14 @@ struct BottomNavigationBar: View {
 
             Circle()
                 .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
-                .frame(width: 95, height: 95)
+                .frame(width: 85, height: 85)
                 .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
                 .overlay(
                     Image(systemName: selectedTabIcon)
                         .font(.system(size: 25))
                         .foregroundColor(.white)
                 )
-                .offset(x: circleOffset(for: selectedTab), y: -25)
+                .offset(x: circleOffset(for: selectedTab), y: -30)
         }
         .frame(height: 90)
     }
@@ -79,7 +81,7 @@ struct CustomTabBarShape: Shape {
         let width = rect.width
         let height = rect.height + 40
         let cornerRadius: CGFloat = 0
-        let notchRadius: CGFloat = 55
+        let notchRadius: CGFloat = 45
         let notchDepth: CGFloat = 20
 
         // calculate centerX based on selected tab
@@ -98,7 +100,7 @@ struct CustomTabBarShape: Shape {
         path.addLine(to: CGPoint(x: 0, y: cornerRadius))
         path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
 
-        path.addLine(to: CGPoint(x: centerX - notchRadius - 10, y: 0))
+        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
         path.addQuadCurve(
             to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
             control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
@@ -113,7 +115,7 @@ struct CustomTabBarShape: Shape {
         )
 
         path.addQuadCurve(
-            to: CGPoint(x: centerX + notchRadius + 10, y: 0),
+            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
             control: CGPoint(x: centerX + notchRadius + 1, y: 0)
         )
         path.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
