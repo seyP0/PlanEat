@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var session: SessionManager
+
     var body: some View {
         VStack(spacing: 0) {
             // MARK: – Header Card
@@ -57,7 +59,6 @@ struct SettingsView: View {
                     .padding(.bottom, 10)
             }
             .frame(width: 400, height: 300)
-            .foregroundColor(.clear)
             .background(Color.white)
             .cornerRadius(20)
             .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
@@ -66,13 +67,13 @@ struct SettingsView: View {
 
             // MARK: – Menu Buttons
             VStack(spacing: 20) {
-                MenuButton(icon: "pencil", title: "Edit Profile")
-                MenuButton(icon: "lock", title: "Password")
-                MenuButton(icon: "globe", title: "Language")
-                MenuButton(icon: "questionmark.circle", title: "Support")
+                MenuButton(icon: "pencil", title: "Edit Profile") { print("Edit Profile tapped") }
+                MenuButton(icon: "lock", title: "Password") { print("Password tapped") }
+                MenuButton(icon: "globe", title: "Language") { print("Language tapped") }
+                MenuButton(icon: "questionmark.circle", title: "Support") { print("Support tapped") }
                 MenuButton(icon: "arrow.forward.square", title: "Sign Out") {
-    session.signOut()
-}
+                    session.signOut()
+                }
             }
             .padding(.top, 50)
             .padding(.horizontal)
@@ -134,24 +135,28 @@ private struct MenuButton: View {
     var action: (() -> Void)?
 
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(.white)
-                .frame(width: 28)
+        Button(action: {
+            action?()
+        }) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+                    .frame(width: 28)
 
-            Text(title)
-                .foregroundColor(.white)
-                .font(.headline)
+                Text(title)
+                    .foregroundColor(.white)
+                    .font(.headline)
 
-            Spacer()
+                Spacer()
 
-            Image(systemName: "chevron.right")
-                .foregroundColor(.white)
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.white)
+            }
+            .padding()
+            .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+            .cornerRadius(12)
         }
-        .padding()
-        .background(Color(red: 0.43, green: 0.57, blue: 0.65))
-        .cornerRadius(12)
     }
 }
 
@@ -201,5 +206,6 @@ struct CustomTab: Shape {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
+            .environmentObject(SessionManager())
     }
 }
