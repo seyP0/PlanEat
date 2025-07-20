@@ -20,20 +20,8 @@ struct MainView: View {
                 case .favorites:
                     MealView()
                 case .profile:
-<<<<<<< HEAD
                     SettingsView()
-=======
-                    VStack {
-                        Text("Profile Page")
-                        Button("Sign Out") {
-                            session.signOut()
-                        }
-                        .padding()
-                        .background(.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
->>>>>>> ee95ae01b2b0f56a11ade7d6c6c29710431de325
+
                 }
             }
             BottomNavigationBar(selectedTab: $selectedTab)
