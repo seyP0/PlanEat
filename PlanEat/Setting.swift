@@ -79,8 +79,26 @@ struct SettingsView: View {
                     VStack(spacing: 20) {
                         // **Edit Profile** now pushes to EditProfileView
                         NavigationLink(destination: EditProfileView()) {
-                            MenuButton(icon: "pencil", title: "Edit Profile", action: nil)
-                        }
+    HStack {
+        Image(systemName: "pencil")
+            .font(.system(size: 20))
+            .foregroundColor(.white)
+            .frame(width: 28)
+
+        Text("Edit Profile")
+            .foregroundColor(.white)
+            .font(.headline)
+
+        Spacer()
+
+        Image(systemName: "chevron.right")
+            .foregroundColor(.white)
+    }
+    .padding()
+    .frame(width: 350)
+    .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+    .cornerRadius(12)
+}
 
                         MenuButton(icon: "lock", title: "Password") { print("Password tapped") }
                         MenuButton(icon: "globe", title: "Language") { print("Language tapped") }
