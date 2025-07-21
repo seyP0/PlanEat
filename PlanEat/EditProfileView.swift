@@ -17,20 +17,6 @@ struct EditProfileView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // MARK: – Nav Bar
-            HStack {
-                Button(action: { dismiss() }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .medium))
-                        Text("Profile")
-                            .font(.headline)
-                    }
-                }
-                .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
-                Spacer()
-            }
-            .padding()
 
             ScrollView {
                 VStack(spacing: 20) {

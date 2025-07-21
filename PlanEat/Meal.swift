@@ -4,24 +4,6 @@ struct MealView: View {
     var body: some View {
         VStack(spacing: 0) {
             
-            // Top Navigation Bar
-            HStack(spacing: 8) {
-                Button(action: {
-                    // your back action
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .medium))
-                        Text("Home")
-                            .font(.headline)
-                    }
-                    .foregroundColor(.black)
-                }
-                Spacer()
-            }
-            .padding(.horizontal)
-            .padding(.top, 16)
-            
             Spacer().frame(height: 20)
             
             // One Blue Rectangle Meal Example
@@ -64,12 +46,5 @@ struct MealView: View {
         }
         .padding(.top, 30)
         .background(Color.white)
-    }
-}
-
-
-struct MealView_Previews: PreviewProvider {
-    static var previews: some View {
-        MealView()
     }
 }

@@ -363,14 +363,15 @@ struct MealsSection: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
-                ForEach($meals) { $meal in
+                ForEach(meals.indices, id: \.self) { idx in
                     MealCard(
-                        title: meal.title,
-                        caloriesRange: meal.caloriesRange,
-                        items: meal.items,
-                        imageName: meal.imageName,
-                        isFavorite: $meal.isFavorite
+                        title: meals[idx].title,
+                        caloriesRange: meals[idx].caloriesRange,
+                        items: meals[idx].items,
+                        imageName: meals[idx].imageName,
+                        isFavorite: $meals[idx].isFavorite   // <-- here
                     )
+                    .frame(width: 160) // whatever your fixed width is
                 }
             }
             .padding(.horizontal)
@@ -396,12 +397,15 @@ struct MealCard: View {
                     .font(.headline)
                     .foregroundColor(.gray)
                 Spacer()
-                Button { isFavorite.toggle() } label: {
+                Button {
+                    isFavorite.toggle()      // flips the binding
+                } label: {
                     Image(systemName: isFavorite ? "star.fill" : "star")
                         .foregroundColor(isFavorite ? .yellow : .gray)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .offset(y: 5)
             }
             .frame(height: 22)  // reserve exactly this much for the HStack
 
@@ -444,19 +448,22 @@ struct MealCard: View {
       .background(Color(red: 0.43, green: 0.57, blue: 0.65))
       .frame(height: 50)
     }
+    .frame(width: 160)
+
     .overlay(
-             // border around entire card
-             RoundedRectangle(cornerRadius: 18)
-                 .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+         // border around entire card
+         RoundedRectangle(cornerRadius: 18)
+             .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+             .allowsHitTesting(false)
+
          )
          .background(
              // make sure clipped to rounded corners
              RoundedRectangle(cornerRadius: 18)
                  .fill(Color.clear)
-         )
+                 .allowsHitTesting(false))
          .cornerRadius(18)
          .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-         .frame(width: 160)
   }
 }
 

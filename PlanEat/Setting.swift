@@ -17,22 +17,6 @@ struct SettingsView: View {
                 VStack(spacing: 0) {
                     // MARK: – Header Card
                     VStack {
-                        HStack(spacing: 8) {
-                            Button(action: {
-                                // your back action
-                            }) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "chevron.left")
-                                        .font(.system(size: 20, weight: .medium))
-                                    Text("Home")
-                                        .font(.headline)
-                                }
-                                .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 50)
 
                         // Profile Image + Add Button
                         ZStack(alignment: .bottomTrailing) {
@@ -55,7 +39,7 @@ struct SettingsView: View {
                             }
                             .offset(x: 6, y: 6)
                         }
-                        .padding(.top, 15)
+                        .padding(.top, 77)
 
                         Text(displayName)
                             .font(.title2)
