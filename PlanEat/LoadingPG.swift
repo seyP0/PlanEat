@@ -1,64 +1,68 @@
 import SwiftUI
+import FirebaseAuth
 
 struct LoadingPG: View {
+    @EnvironmentObject var session: SessionManager
+
     @State private var isActive = false
     @State private var leftMouth = "mouthNeutral"
     @State private var rightMouth = "mouthNeutral"
 
     var body: some View {
-        if isActive {
-            LogIn()
-        } else {
+        Group {
+            if session.isLoggedIn {
+                MainView()
+            } else {
+                LogIn()
+            }
+        }
+        .onAppear {
+            animateMouths()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                session.checkLogin()
+            }
+        }
+    }
+
+    var splashScreen: some View {
+        ZStack {
+            Color.white.ignoresSafeArea()
+
             ZStack {
-                Color.white.ignoresSafeArea()
-                
+                Image("logoname")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 280)
+
                 ZStack {
-                    
-                    // Full logo image with the "a" letters
-                    Image("logoname") // this should include all letters including the a's
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 280)
-
-                    // LEFT FACE (inside first "a")
-                    ZStack {
-                        Image("faceLeft")
-                        Image(leftMouth)
-                            .transition(.opacity)
-                            .animation(.easeInOut(duration: 1.0), value: leftMouth)
-                            .offset(x: 0, y: 4)
-                    }
-                    .frame(width: 40, height: 40)
-                    .offset(x: -67.5, y: 12) // tweak this until it's centered inside the first "a"
-
-                    // RIGHT FACE (inside second "a")
-                    ZStack {
-                        Image("faceRight")
-                        Image(rightMouth)
-                            .transition(.opacity)
-                            .animation(.easeInOut(duration: 1.0), value: rightMouth)
-                            .offset(x: 0, y: 4)
-                    }
-                    .frame(width: 40, height: 40)
-                    .offset(x: 43, y: 12) // tweak this until it's centered inside the second "a"
+                    Image("faceLeft")
+                    Image(leftMouth)
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 1.0), value: leftMouth)
+                        .offset(x: 0, y: 4)
                 }
-                .padding(.top, 60)
-                .offset(x: 15, y: -50)
+                .frame(width: 40, height: 40)
+                .offset(x: -67.5, y: 12)
+
+                ZStack {
+                    Image("faceRight")
+                    Image(rightMouth)
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 1.0), value: rightMouth)
+                        .offset(x: 0, y: 4)
+                }
+                .frame(width: 40, height: 40)
+                .offset(x: 43, y: 12)
             }
-            .onAppear {
-                // Animate mouths
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    leftMouth = "mouthSmile"
-                    rightMouth = "mouthFrown"
-                }
+            .padding(.top, 60)
+            .offset(x: 15, y: -50)
+        }
+    }
 
-                // Navigate to next screen
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    withAnimation {
-                        isActive = true
-                    }
-                }
-            }
+    func animateMouths() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            leftMouth = "mouthSmile"
+            rightMouth = "mouthFrown"
         }
     }
 }

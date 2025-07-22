@@ -15,7 +15,6 @@ struct HomePage: View {
             DynamicWeeklyCalendar()
             MealsSection()
             Spacer()
-            BottomNavigationBar()
         }
         .padding(.top)
         .background(.white)
@@ -364,14 +363,15 @@ struct MealsSection: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
-                ForEach($meals) { $meal in
+                ForEach(meals.indices, id: \.self) { idx in
                     MealCard(
-                        title: meal.title,
-                        caloriesRange: meal.caloriesRange,
-                        items: meal.items,
-                        imageName: meal.imageName,
-                        isFavorite: $meal.isFavorite
+                        title: meals[idx].title,
+                        caloriesRange: meals[idx].caloriesRange,
+                        items: meals[idx].items,
+                        imageName: meals[idx].imageName,
+                        isFavorite: $meals[idx].isFavorite   // <-- here
                     )
+                    .frame(width: 160) // whatever your fixed width is
                 }
             }
             .padding(.horizontal)
@@ -397,12 +397,15 @@ struct MealCard: View {
                     .font(.headline)
                     .foregroundColor(.gray)
                 Spacer()
-                Button { isFavorite.toggle() } label: {
+                Button {
+                    isFavorite.toggle()      // flips the binding
+                } label: {
                     Image(systemName: isFavorite ? "star.fill" : "star")
                         .foregroundColor(isFavorite ? .yellow : .gray)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .offset(y: 5)
             }
             .frame(height: 22)  // reserve exactly this much for the HStack
 
@@ -445,138 +448,24 @@ struct MealCard: View {
       .background(Color(red: 0.43, green: 0.57, blue: 0.65))
       .frame(height: 50)
     }
+    .frame(width: 160)
+
     .overlay(
-             // border around entire card
-             RoundedRectangle(cornerRadius: 18)
-                 .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+         // border around entire card
+         RoundedRectangle(cornerRadius: 18)
+             .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+             .allowsHitTesting(false)
+
          )
          .background(
              // make sure clipped to rounded corners
              RoundedRectangle(cornerRadius: 18)
                  .fill(Color.clear)
-         )
+                 .allowsHitTesting(false))
          .cornerRadius(18)
          .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-         .frame(width: 160)
   }
 }
-
-
-struct BottomNavigationBar: View {
-    var body: some View {
-        ZStack {
-            // Background shape with notch
-            CustomTabBarShape()
-                .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
-                .frame(height: 90)
-                .edgesIgnoringSafeArea(.bottom)
-
-            HStack(spacing: 0) {
-                // HOME — centered under circle
-                VStack {
-                    Spacer()
-                    Image(systemName: "house.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 25))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-
-                // CALENDAR
-                VStack {
-                    Spacer()
-                    Image(systemName: "calendar")
-                        .foregroundColor(.white)
-                        .font(.system(size: 25))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-
-                // STAR
-                VStack {
-                    Spacer()
-                    Image(systemName: "star")
-                        .foregroundColor(.white)
-                        .font(.system(size: 25))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-
-                // PERSON
-                VStack {
-                    Spacer()
-                    Image(systemName: "person")
-                        .foregroundColor(.white)
-                        .font(.system(size: 25))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .padding(.horizontal, 20)
-
-            // Floating circle (active tab)
-            Circle()
-                .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
-                .frame(width: 95, height: 95)
-                .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 4)
-                .overlay(
-                    Image(systemName: "house.fill")
-                        .font(.system(size: 25))
-                        .foregroundColor(.white)
-                )
-                .offset(x: -UIScreen.main.bounds.width / 2 + 67, y: -25)
-        }
-        .frame(height: 90)
-    }
-}
-
-
-
-
-struct CustomTabBarShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        let width = rect.width
-        let height = rect.height + 40
-        let cornerRadius: CGFloat = 0
-        let notchRadius: CGFloat = 55
-        let centerX = width / 2 - 130
-        let notchDepth: CGFloat = 20
-
-        path.move(to: CGPoint(x: 0, y: height))
-        path.addLine(to: CGPoint(x: 0, y: cornerRadius))
-        path.addQuadCurve(to: CGPoint(x: cornerRadius, y: 0), control: CGPoint(x: 0, y: 0))
-
-        // Left edge before notch
-        path.addLine(to: CGPoint(x: centerX - notchRadius - 40, y: 0))
-        path.addQuadCurve(
-            to: CGPoint(x: centerX - notchRadius, y: notchDepth * 1.5),
-            control: CGPoint(x: centerX - notchRadius + 0.5, y: 0)
-        )
-
-
-        path.addArc(
-            center: CGPoint(x: centerX, y: notchDepth),
-            radius: notchRadius,
-            startAngle: .degrees(180),
-            endAngle: .degrees(0),
-            clockwise: true
-        )
-
-        path.addQuadCurve(
-            to: CGPoint(x: centerX + notchRadius + 30, y: 0),
-            control: CGPoint(x: centerX + notchRadius + 1, y: 0)
-        )
-        path.addLine(to: CGPoint(x: width - 16, y: 0))
-        path.addQuadCurve(to: CGPoint(x: width, y: 16), control: CGPoint(x: width, y: 0))
-        path.addLine(to: CGPoint(x: width, y: height))
-        path.closeSubpath()
-
-        return path
-    }
-}
-
 
 struct HomePage_previews: PreviewProvider {
     static var previews: some View {

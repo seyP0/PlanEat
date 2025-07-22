@@ -2,22 +2,20 @@ import SwiftUI
 import FirebaseAuth
 
 struct LogIn: View {
+    @EnvironmentObject var session: SessionManager
     @State private var email = ""
     @State private var password = ""
-    @State private var isLoggedIn = false
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 30) {
                 Spacer()
 
-                // Logo
                 Image("FullLogo")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 241.26923, height: 220)
 
-                // Email + Password Fields
                 VStack(spacing: 19) {
                     TextField("Email", text: $email)
                         .font(Font.custom("Baloo Bhaijaan 2", size: 14))
@@ -40,20 +38,13 @@ struct LogIn: View {
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 50)
 
-                // Navigation to HomePage after login
-                NavigationLink(destination: HomePage(), isActive: $isLoggedIn) {
-                    EmptyView()
-                }
-
-
-                // Sign In Button
                 Button(action: {
                     Auth.auth().signIn(withEmail: email, password: password) { result, error in
                         if let error = error {
                             print("Login failed:", error.localizedDescription)
                         } else {
                             print("Login success! UID:", result?.user.uid ?? "")
-                            isLoggedIn = true
+                            session.isLoggedIn = true
                         }
                     }
                 }) {
@@ -69,8 +60,7 @@ struct LogIn: View {
                         .shadow(color: .black.opacity(0.25), radius: 5, x: 0, y: 4)
                 }
                 .padding(.horizontal, 50)
-            
-                // OR Divider
+
                 HStack {
                     Rectangle().frame(width: 70, height: 1).foregroundColor(.black)
                     Text("or")
@@ -80,7 +70,6 @@ struct LogIn: View {
                 }
                 .padding(.horizontal, 32)
 
-                // Social Buttons
                 HStack(spacing: 24) {
                     Button(action: {}) {
                         ZStack {
@@ -113,7 +102,6 @@ struct LogIn: View {
                     }
                 }
 
-                // Sign Up and Forgot Password
                 VStack(spacing: 8) {
                     HStack(spacing: 0) {
                         Text("Don’t have an account?")
@@ -123,31 +111,24 @@ struct LogIn: View {
                         NavigationLink(destination: SignUp()) {
                             Text("Sign Up")
                                 .font(Font.custom("ABeeZee", size: 10))
-                                .underline(true, pattern: .solid)
-                                .multilineTextAlignment(.center)
+                                .underline()
                                 .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
                                 .frame(width: 40, height: 19, alignment: .top)
                                 .offset(x: -3)
                         }
+                    }
 
+                    NavigationLink(destination: ForgotPasswordView()) {
+                        Text("Forgot Password?")
+                            .font(Font.custom("ABeeZee", size: 10))
+                            .underline()
+                            .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
+                    }
+                }
+                .padding(.top, 8)
 
-                                        }
-
-
-                                        NavigationLink(destination: ForgotPasswordView()) {
-                                            Text("Forgot Password?")
-                                                .font(Font.custom("ABeeZee", size: 10))
-                                                .underline()
-                                                .foregroundColor(Color(red: 0.49, green: 0.63, blue: 0.66))
-                                        }
-
-                                
-                                    }
-                                    .padding(.top, 8)
-
-                                    Spacer()
-                                }
-                                
+                Spacer()
+            }
             .padding(.top)
             .background(
                 RoundedCorner(radius: 900, corners: [.topLeft, .topRight])
@@ -174,9 +155,3 @@ struct RoundedCorner: Shape {
     }
 }
 
-struct LogIn_Previews: PreviewProvider {
-    static var previews: some View {
-        LogIn()
-            .previewDevice("iPhone 16")
-    }
-}
