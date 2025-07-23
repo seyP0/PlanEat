@@ -7,35 +7,68 @@ struct HomePage: View {
     @State private var snackRecommendation = "Try Greek Berries Yogurt!"
     @State private var selectedDate = 5
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HeaderSection(userName: userName)
-            SnackImageSection(snackText: snackRecommendation)
-            NutrientSummary()
-            DynamicWeeklyCalendar()
-            MealsSection()
-            Spacer()
-        }
-        .padding(.top)
-        .background(.white)
-        .ignoresSafeArea(edges: .bottom)
-        .onAppear {
-            fetchUserName()
+    // === Mood feature states ===
+    @State private var showMoodPopup = false
+    @State private var selectedMoodFace: String? = nil
+    @State private var selectedMoodLabel: String? = nil
+
+    /// Map the selection to your actual asset name
+    private var moodImageName: String {
+        switch selectedMoodFace {
+        case "Happy":   return "smile"
+        case "Neutral": return "neutral"
+        case "Sad":     return "sad"
+        case "Angry":   return "angry"
+        default:        return "smile" // fallback / initial
         }
     }
+
+    var body: some View {
+        ZStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HeaderSection(userName: userName)
+
+                // Pass emoji image & tap handler
+                SnackImageSection(
+                    snackText: snackRecommendation,
+                    emojiImageName: moodImageName
+                ) {
+                    withAnimation { showMoodPopup = true }
+                }
+
+                NutrientSummary()
+                DynamicWeeklyCalendar()
+                MealsSection()
+                Spacer()
+            }
+            .padding(.top)
+            .background(.white)
+            .ignoresSafeArea(edges: .bottom)
+            .onAppear { fetchUserName() }
+
+            // Overlay popup
+            if showMoodPopup {
+                FirstPopUp(
+                    selectedMoodFace: $selectedMoodFace,
+                    selectedMoodLabel: $selectedMoodLabel
+                ) {
+                    withAnimation { showMoodPopup = false }
+                }
+            }
+        }
+    }
+
     func fetchUserName() {
         guard let uid = Auth.auth().currentUser?.uid else {
             print("No user logged in.")
             return
         }
-
         let db = Firestore.firestore()
         db.collection("users").document(uid).getDocument { document, error in
             if let error = error {
                 print("Error fetching user: \(error.localizedDescription)")
                 return
             }
-
             if let document = document, document.exists {
                 let data = document.data()
                 self.userName = data?["name"] as? String ?? "User"
@@ -51,7 +84,7 @@ struct HeaderSection: View {
 
     var body: some View {
         HStack {
-            Image("smile 10")
+            Image("smile 10") // keep your original asset
                 .resizable()
                 .frame(width: 60, height: 60)
                 .clipShape(Circle())
@@ -82,12 +115,8 @@ struct HeaderSection: View {
         .background(.white)
         .cornerRadius(30)
         .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 4)
-
     }
-
 }
-
-
 
 struct BubbleTail: Shape {
     func path(in rect: CGRect) -> Path {
@@ -101,24 +130,27 @@ struct BubbleTail: Shape {
     }
 }
 
-
+// ===== UPDATED to support mood emoji tap =====
 struct SnackImageSection: View {
     var snackText: String
+    let emojiImageName: String
+    var onEmojiTap: () -> Void
 
     var body: some View {
         VStack(alignment: .leading) {
             Text("Today's recommended snack:")
-                .font(
-                Font.custom("Baloo Bhaijaan 2", size: 13)
-                .weight(.bold)
-                )
+                .font(Font.custom("Baloo Bhaijaan 2", size: 13).weight(.bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(red: 0.51, green: 0.6, blue: 0.62))
                 .frame(width: 179, height: 22, alignment: .top)
+
             HStack(alignment: .center, spacing: 10) {
-                Image("smile-2")
-                    .resizable()
-                    .frame(width: 65, height: 65)
+                Button(action: onEmojiTap) {
+                    Image(emojiImageName)
+                        .resizable()
+                        .frame(width: 65, height: 65)
+                }
+                .buttonStyle(PlainButtonStyle())
 
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 20)
@@ -128,17 +160,14 @@ struct SnackImageSection: View {
 
                     HStack(spacing: 0) {
                         BubbleTail()
-                           .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
-                           .frame(width: 20, height: 20)
-                           .rotationEffect(.degrees(180))
-                           .offset(x: -10)
+                            .fill(Color(red: 0.25, green: 0.37, blue: 0.44))
+                            .frame(width: 20, height: 20)
+                            .rotationEffect(.degrees(180))
+                            .offset(x: -10)
                         Text(snackText)
-                            .font(Font.custom("Baloo Bhaijaan 2", size: 16)
-                            .weight(.bold)
-                            )
+                            .font(Font.custom("Baloo Bhaijaan 2", size: 16).weight(.bold))
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white)
-
                             .frame(width: 231, height: 22, alignment: .top)
                     }
                 }
@@ -150,15 +179,10 @@ struct SnackImageSection: View {
     }
 }
 
-
-
-
-
-
 struct NutrientSummary: View {
     var body: some View {
         HStack {
-            Spacer(minLength: 0) // Pushes the full content to the right
+            Spacer(minLength: 0)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 20)
@@ -203,13 +227,9 @@ struct NutrientSummary: View {
                         Text("1300")
                             .foregroundColor(.white)
                             .font(Font.custom("Baloo Bhaijaan 2", size: 20).weight(.bold))
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity, maxHeight: 20, alignment: .init(horizontal: .center, vertical: .bottom))
-
                         Text("\nkcal")
                             .foregroundColor(.white)
                             .font(Font.custom("Baloo Bhaijaan 2", size: 15))
-                            .multilineTextAlignment(.center)
                     }
                     .frame(width: 110, height: 80)
                 }
@@ -220,13 +240,11 @@ struct NutrientSummary: View {
     }
 }
 
-
 struct DynamicWeeklyCalendar: View {
     @State private var selectedDate = Date()
     private let calendar = Calendar.current
     private let today = Date()
 
-    // MARK: — Formatters
     private static let monthYearFormatter: DateFormatter = {
         let df = DateFormatter()
         df.dateFormat = "MMMM yyyy"
@@ -238,48 +256,33 @@ struct DynamicWeeklyCalendar: View {
         return df
     }()
     private let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
-    // i.e. ["S","M","T","W","T","F","S"]
 
-    // MARK: — Computed Properties
-    /// “May 2025”
     private var monthYearString: String {
         DynamicWeeklyCalendar.monthYearFormatter.string(from: today)
     }
 
-    /// The Sunday at the start of this week
     private var startOfWeek: Date {
-        calendar.date(
-          from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
-        )!
+        calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
     }
 
-    /// Seven dates from Sunday through Saturday
     private var weekDates: [Date] {
-        (0..<7).compactMap {
-            calendar.date(byAdding: .day, value: $0, to: startOfWeek)
-        }
+        (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: startOfWeek) }
     }
 
     var body: some View {
         VStack(spacing: 4) {
-            // ◀︎ [Month Year] ▶︎
             HStack {
-                Button { /* prev month */ } label: {
-                    Image(systemName: "chevron.left")
-                }
+                Button { } label: { Image(systemName: "chevron.left") }
                 Spacer()
                 Text(monthYearString)
                     .font(.custom("Baloo Bhaijaan 2", size: 16))
                     .fontWeight(.semibold)
                 Spacer()
-                Button { /* next month */ } label: {
-                    Image(systemName: "chevron.right")
-                }
+                Button { } label: { Image(systemName: "chevron.right") }
             }
             .font(.custom("Baloo Bhaijaan 2", size: 14))
             .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
 
-            // Weekday initials
             HStack(spacing: 0) {
                 ForEach(0..<7) { idx in
                     Text(weekdaySymbols[idx])
@@ -289,7 +292,6 @@ struct DynamicWeeklyCalendar: View {
                 }
             }
 
-            // Dates row
             HStack(spacing: 0) {
                 ForEach(weekDates, id: \.self) { date in
                     let dayString = DynamicWeeklyCalendar.dayFormatter.string(from: date)
@@ -310,8 +312,7 @@ struct DynamicWeeklyCalendar: View {
                                             .fill(Color(red: 0.43, green: 0.57, blue: 0.65))
                                             .frame(width: 40, height: 40)
                                         Circle()
-                                            .stroke(Color(red: 0.43, green: 0.57, blue: 0.65),
-                                                    lineWidth: 2)
+                                            .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
                                             .frame(width: 40, height: 40)
                                     }
                                 }
@@ -326,24 +327,21 @@ struct DynamicWeeklyCalendar: View {
         .background(
             RoundedRectangle(cornerRadius: 30)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.1),
-                        radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
         )
         .padding(.horizontal, 16)
     }
 }
 
-/// A model for one meal card.
 struct Meal: Identifiable {
     let id = UUID()
     let title: String
     let caloriesRange: String
     let items: [String]
-    let imageName: String?       // nil if you don’t have an image yet
+    let imageName: String?
     var isFavorite: Bool = false
 }
 
-/// The horizontal scrolling section of meals.
 struct MealsSection: View {
     @State private var meals: [Meal] = [
         Meal(title: "Breakfast",
@@ -369,9 +367,9 @@ struct MealsSection: View {
                         caloriesRange: meals[idx].caloriesRange,
                         items: meals[idx].items,
                         imageName: meals[idx].imageName,
-                        isFavorite: $meals[idx].isFavorite   // <-- here
+                        isFavorite: $meals[idx].isFavorite
                     )
-                    .frame(width: 160) // whatever your fixed width is
+                    .frame(width: 160)
                 }
             }
             .padding(.horizontal)
@@ -379,97 +377,88 @@ struct MealsSection: View {
     }
 }
 
-/// One individual meal card.
 struct MealCard: View {
-  let title: String
-  let caloriesRange: String
-  let items: [String]
-  let imageName: String?
-  @Binding var isFavorite: Bool
+    let title: String
+    let caloriesRange: String
+    let items: [String]
+    let imageName: String?
+    @Binding var isFavorite: Bool
 
-  var body: some View {
-    VStack(spacing: 0) {
-      // 1) Header (≈ 40pt tall)
-    // — 1) Header (lifted up) —
-        VStack(alignment: .leading, spacing: 1) {
-            HStack {
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.gray)
-                Spacer()
-                Button {
-                    isFavorite.toggle()      // flips the binding
-                } label: {
-                    Image(systemName: isFavorite ? "star.fill" : "star")
-                        .foregroundColor(isFavorite ? .yellow : .gray)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Button {
+                        isFavorite.toggle()
+                    } label: {
+                        Image(systemName: isFavorite ? "star.fill" : "star")
+                            .foregroundColor(isFavorite ? .yellow : .gray)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+                .frame(height: 22)
+
+                Text(caloriesRange)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .padding(.top, -2)
             }
-            .frame(height: 22)  // reserve exactly this much for the HStack
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .frame(height: 45)
+            .background(Color.white)
 
-            Text(caloriesRange)
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.top, -2) // lift it up closer to the title
+            if let name = imageName {
+                Image(name)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 80)
+                    .clipped()
+            } else {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(height: 80)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(items, id: \.self) { item in
+                    Text("• \(item)")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity)
+            .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+            .frame(height: 50)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)   // much less breathing room
-        .frame(height: 45)       // total header is now only 32pts high
-        .background(Color.white)
-
-
-      // 2) Image (flexible up to 80pt)
-      if let name = imageName {
-        Image(name)
-          .resizable()
-          .scaledToFill()
-          .frame(height: 80)
-          .clipped()
-      } else {
-        Rectangle()
-          .fill(Color.gray.opacity(0.2))
-          .frame(height: 80)
-      }
-
-      // 3) Footer (≈ 80pt tall)
-      VStack(alignment: .leading, spacing: 4) {
-        ForEach(items, id: \.self) { item in
-          Text("• \(item)")
-            .font(.caption)
-            .foregroundColor(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-        }
-      }
-      .padding(8)
-      .frame(maxWidth: .infinity)
-      .background(Color(red: 0.43, green: 0.57, blue: 0.65))
-      .frame(height: 50)
+        .frame(width: 160)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+                .allowsHitTesting(false)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.clear)
+                .allowsHitTesting(false)
+        )
+        .cornerRadius(18)
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
-    .frame(width: 160)
-
-    .overlay(
-         // border around entire card
-         RoundedRectangle(cornerRadius: 18)
-             .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
-             .allowsHitTesting(false)
-
-         )
-         .background(
-             // make sure clipped to rounded corners
-             RoundedRectangle(cornerRadius: 18)
-                 .fill(Color.clear)
-                 .allowsHitTesting(false))
-         .cornerRadius(18)
-         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-  }
 }
+
 
 struct HomePage_previews: PreviewProvider {
     static var previews: some View {
         HomePage()
     }
 }
-
