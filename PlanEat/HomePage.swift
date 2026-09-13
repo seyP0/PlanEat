@@ -1,10 +1,7 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
-/* Login Info
-    Email: modkey@gmail.com
-    Password: 123456
- */
+
 
 struct HomePage: View {
     @State private var userName = ""
