@@ -71,7 +71,7 @@ struct CalendarSmileView: View {
                 ForEach(monthDates, id: \.self) { date in
                     let day = calendar.component(.day, from: date)
                     VStack(spacing: 4) {
-                        Image("smile 2")
+                        Image("stone")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 50, height: 50)
@@ -91,12 +91,10 @@ struct CalendarSmileView: View {
         .background(Color.white)
     }
 }
-
-
-struct CalendarSmileView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarSmileView()
-    }
-}
-
-
+//
+//
+//struct CalendarSmileView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CalendarSmileView()
+//    }
+//}
