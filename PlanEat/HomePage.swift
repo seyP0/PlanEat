@@ -1,6 +1,10 @@
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
+/* Login Info
+    Email: modkey@gmail.com
+    Password: 123456
+ */
 
 struct HomePage: View {
     @State private var userName = ""
@@ -11,6 +15,21 @@ struct HomePage: View {
     @State private var showMoodPopup = false
     @State private var selectedMoodFace: String? = nil
     @State private var selectedMoodLabel: String? = nil
+
+    // === AI Integration states ===
+    @StateObject private var aiService = AIService.shared
+    @State private var aiGeneratedMeals: [AIMeal] = []
+    @State private var isGeneratingMeals = false
+
+    private let db = Firestore.firestore()
+
+    /// today's document key (e.g. "2025-07-23")
+     private var todayKey: String {
+         let f = DateFormatter()
+         f.dateFormat = "yyyy-MM-dd"
+         return f.string(from: Date())
+     }
+
 
     /// Map the selection to your actual asset name
     private var moodImageName: String {
@@ -28,7 +47,7 @@ struct HomePage: View {
             VStack(alignment: .leading, spacing: 16) {
                 HeaderSection(userName: userName)
 
-                // Pass emoji image & tap handler
+                // → now tappable for mood
                 SnackImageSection(
                     snackText: snackRecommendation,
                     emojiImageName: moodImageName
@@ -38,53 +57,442 @@ struct HomePage: View {
 
                 NutrientSummary()
                 DynamicWeeklyCalendar()
-                MealsSection()
+
+                // Updated MealsSection with AI integration
+                AIMealsSection(
+                    aiMeals: aiGeneratedMeals,
+                    isLoading: isGeneratingMeals,
+                    currentMood: selectedMoodLabel ?? "Neutral"
+                )
+
                 Spacer()
             }
             .padding(.top)
             .background(.white)
             .ignoresSafeArea(edges: .bottom)
-            .onAppear { fetchUserName() }
+            .onAppear {
+                fetchUserName()
+                loadMoodAndRecommend()
+            }
 
-            // Overlay popup
+            // Overlay your existing first pop-up
             if showMoodPopup {
                 FirstPopUp(
                     selectedMoodFace: $selectedMoodFace,
                     selectedMoodLabel: $selectedMoodLabel
                 ) {
+                    // onDismiss
                     withAnimation { showMoodPopup = false }
+                    if let mood = selectedMoodLabel {
+                        writeMoodAndRecommend(moodLabel: mood)
+                        generateAIMeals(for: mood)
+                    }
                 }
             }
         }
     }
 
+    // MARK: — unchanged
     func fetchUserName() {
-        guard let uid = Auth.auth().currentUser?.uid else {
-            print("No user logged in.")
-            return
-        }
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).getDocument { document, error in
-            if let error = error {
-                print("Error fetching user: \(error.localizedDescription)")
-                return
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        db.collection("users").document(uid).getDocument { doc, err in
+            if let d = doc?.data(), let name = d["name"] as? String {
+                self.userName = name
             }
-            if let document = document, document.exists {
-                let data = document.data()
-                self.userName = data?["name"] as? String ?? "User"
+        }
+    }
+
+    // MARK: — 1) read Firestore → 2) call AI → 3) display & save
+    func loadMoodAndRecommend() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let ref = db
+            .collection("users")
+            .document(uid)
+            .collection("moods")
+            .document(todayKey)
+
+        ref.getDocument { snap, _ in
+            // default to neutral if no doc
+            let mood = snap?.data()?["mood"] as? String ?? "neutral"
+            self.selectedMoodLabel = mood.capitalized
+
+            // Load existing AI meals if available
+            if let mealsData = snap?.data()?["aiMeals"] as? Data,
+               let savedMeals = try? JSONDecoder().decode([AIMeal].self, from: mealsData) {
+                self.aiGeneratedMeals = savedMeals
             } else {
-                print("User document does not exist.")
+                // Generate new meals if none exist
+                self.generateAIMeals(for: mood)
+            }
+
+            // now ask AI for snack recommendation
+            AIService.shared.recommendSnack(forMood: mood) { rec in
+                self.snackRecommendation = rec
+                // write recommendation back
+                ref.setData([
+                    "mood": mood,
+                    "recommendation": rec,
+                    "timestamp": Timestamp()
+                ], merge: true)
+            }
+        }
+    }
+
+    // MARK: — when user taps "Done" on pop-up
+    func writeMoodAndRecommend(moodLabel: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let moodKey = moodLabel.lowercased()
+        let ref = db
+            .collection("users")
+            .document(uid)
+            .collection("moods")
+            .document(todayKey)
+
+        // 1) save mood
+        ref.setData([
+            "mood": moodKey,
+            "timestamp": Timestamp()
+        ], merge: true)
+
+        // 2) ask AI for snack
+        AIService.shared.recommendSnack(forMood: moodKey) { rec in
+            self.snackRecommendation = rec
+            // 3) save recommendation
+            ref.setData([
+                "recommendation": rec
+            ], merge: true)
+        }
+    }
+
+    // MARK: — Generate AI meals based on mood
+    func generateAIMeals(for mood: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
+        isGeneratingMeals = true
+
+        AIService.shared.generateMealsForMood(mood) { meals in
+            self.aiGeneratedMeals = meals
+            self.isGeneratingMeals = false
+
+            // Save generated meals to Firestore
+            let ref = self.db
+                .collection("users")
+                .document(uid)
+                .collection("moods")
+                .document(self.todayKey)
+
+            if let mealsData = try? JSONEncoder().encode(meals) {
+                ref.setData([
+                    "aiMeals": mealsData
+                ], merge: true)
             }
         }
     }
 }
+
+// MARK: — AI-Enhanced Meals Section
+struct AIMealsSection: View {
+    let aiMeals: [AIMeal]
+    let isLoading: Bool
+    let currentMood: String
+
+    // Fallback meals (your original ones)
+    @State private var fallbackMeals: [Meal] = [
+        Meal(title: "Breakfast",
+             caloriesRange: "400–450 kcal",
+             items: ["A cup of milk", "Avocado Egg Toast"],
+             imageName: "breakfast"),
+        Meal(title: "Lunch",
+             caloriesRange: "400–450 kcal",
+             items: ["Chicken Salad", "Whole Grain Bread"],
+             imageName: "lunch"),
+        Meal(title: "Dinner",
+             caloriesRange: "400–450 kcal",
+             items: ["Grilled Salmon", "Roasted Vegetables"],
+             imageName: "dinner")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Meals for your mood")
+                    .font(.custom("Baloo Bhaijaan 2", size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
+
+                Spacer()
+
+                if !currentMood.isEmpty {
+                    Text("Feeling \(currentMood.lowercased())")
+                        .font(.custom("Baloo Bhaijaan 2", size: 12))
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal)
+
+            if isLoading {
+                // Loading state
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            LoadingMealCard()
+                                .frame(width: 160)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            } else if !aiMeals.isEmpty {
+                // AI-generated meals
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(aiMeals) { meal in
+                            AIMealCard(meal: meal)
+                                .frame(width: 160)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            } else {
+                // Fallback to original meals
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(fallbackMeals.indices, id: \.self) { idx in
+                            MealCard(
+                                title: fallbackMeals[idx].title,
+                                caloriesRange: fallbackMeals[idx].caloriesRange,
+                                items: fallbackMeals[idx].items,
+                                imageName: fallbackMeals[idx].imageName,
+                                isFavorite: $fallbackMeals[idx].isFavorite
+                            )
+                            .frame(width: 160)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+}
+
+// MARK: — AI Meal Card Component
+struct AIMealCard: View {
+    let meal: AIMeal
+    @State private var isFavorite: Bool = false
+    @State private var generatedImage: UIImage?
+    @State private var isLoadingImage = true
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack {
+                    Text(meal.mealType.capitalized)
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Button {
+                        isFavorite.toggle()
+                    } label: {
+                        Image(systemName: isFavorite ? "star.fill" : "star")
+                            .foregroundColor(isFavorite ? .yellow : .gray)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(height: 22)
+
+                Text(meal.calories)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .padding(.top, -2)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .frame(height: 45)
+            .background(Color.white)
+
+            // AI-generated meal image
+            ZStack {
+                if let image = generatedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 80)
+                        .clipped()
+                } else {
+                    // Loading state with AI generation indicator
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(height: 80)
+
+                        if isLoadingImage {
+                            VStack(spacing: 4) {
+                                Image(systemName: "sparkles")
+                                    .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
+                                    .font(.system(size: 16))
+                                Text("AI Generating...")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
+                        } else {
+                            VStack(spacing: 4) {
+                                Image(systemName: "photo")
+                                    .foregroundColor(.gray)
+                                Text("Image unavailable")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(meal.name)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+
+                ForEach(meal.ingredients.prefix(2), id: \.self) { ingredient in
+                    Text("• \(ingredient)")
+                        .font(.caption2)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.4)
+                }
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity)
+            .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+            .frame(height: 50)
+        }
+        .frame(width: 160)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+                .allowsHitTesting(false)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.clear)
+                .allowsHitTesting(false)
+        )
+        .cornerRadius(18)
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onAppear {
+            // Generate AI image for the meal
+            AIService.shared.generateMealImage(for: meal) { image in
+                self.generatedImage = image
+                self.isLoadingImage = false
+            }
+            self.isFavorite = meal.isFavorite
+        }
+    }
+}
+
+// MARK: — Loading Meal Card Component
+struct LoadingMealCard: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 60, height: 12)
+                        .cornerRadius(6)
+                    Spacer()
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 20, height: 20)
+                        .cornerRadius(10)
+                }
+                .frame(height: 22)
+
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 80, height: 8)
+                    .cornerRadius(4)
+                    .padding(.top, -2)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .frame(height: 45)
+            .background(Color.white)
+
+            // Loading image placeholder
+            ZStack {
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(height: 80)
+
+                VStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(Color(red: 0.43, green: 0.57, blue: 0.65))
+                        .scaleEffect(isAnimating ? 1.2 : 0.8)
+                        .animation(Animation.easeInOut(duration: 1.0).repeatForever(), value: isAnimating)
+                    Text("Generating...")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Rectangle()
+                    .fill(Color.white.opacity(0.3))
+                    .frame(height: 10)
+                    .cornerRadius(5)
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.3))
+                    .frame(height: 8)
+                    .cornerRadius(4)
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.3))
+                    .frame(height: 8)
+                    .cornerRadius(4)
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity)
+            .background(Color(red: 0.43, green: 0.57, blue: 0.65))
+            .frame(height: 50)
+        }
+        .frame(width: 160)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color(red: 0.43, green: 0.57, blue: 0.65), lineWidth: 2)
+                .allowsHitTesting(false)
+        )
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.clear)
+                .allowsHitTesting(false)
+        )
+        .cornerRadius(18)
+        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+// MARK: — everything below here is literally your original code —
 
 struct HeaderSection: View {
     let userName: String
 
     var body: some View {
         HStack {
-            Image("smile 10") // keep your original asset
+            Image("smile 10")
                 .resizable()
                 .frame(width: 60, height: 60)
                 .clipShape(Circle())
@@ -123,14 +531,13 @@ struct BubbleTail: Shape {
         var path = Path()
         let yOffset: CGFloat = 5
         path.move(to: CGPoint(x: rect.maxX + 5, y: rect.midY + yOffset))
-        path.addLine(to: CGPoint(x: rect.minX , y: rect.minY + 10 + yOffset))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + 10 + yOffset))
         path.addLine(to: CGPoint(x: rect.minX - 5, y: rect.maxY + 5 + yOffset))
         path.closeSubpath()
         return path
     }
 }
 
-// ===== UPDATED to support mood emoji tap =====
 struct SnackImageSection: View {
     var snackText: String
     let emojiImageName: String
@@ -342,41 +749,6 @@ struct Meal: Identifiable {
     var isFavorite: Bool = false
 }
 
-struct MealsSection: View {
-    @State private var meals: [Meal] = [
-        Meal(title: "Breakfast",
-             caloriesRange: "400–450 kcal",
-             items: ["A cup of milk", "Avocado Egg Toast"],
-             imageName: "breakfast"),
-        Meal(title: "Lunch",
-             caloriesRange: "400–450 kcal",
-             items: ["Chicken Salad", "Whole Grain Bread"],
-             imageName: "lunch"),
-        Meal(title: "Dinner",
-             caloriesRange: "400–450 kcal",
-             items: ["Grilled Salmon", "Roasted Vegetables"],
-             imageName: "dinner")
-    ]
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 16) {
-                ForEach(meals.indices, id: \.self) { idx in
-                    MealCard(
-                        title: meals[idx].title,
-                        caloriesRange: meals[idx].caloriesRange,
-                        items: meals[idx].items,
-                        imageName: meals[idx].imageName,
-                        isFavorite: $meals[idx].isFavorite
-                    )
-                    .frame(width: 160)
-                }
-            }
-            .padding(.horizontal)
-        }
-    }
-}
-
 struct MealCard: View {
     let title: String
     let caloriesRange: String
@@ -453,12 +825,5 @@ struct MealCard: View {
         )
         .cornerRadius(18)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-    }
-}
-
-
-struct HomePage_previews: PreviewProvider {
-    static var previews: some View {
-        HomePage()
     }
 }

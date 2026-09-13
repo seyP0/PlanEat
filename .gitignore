@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+**/xcuserdata/
+*.xcuserstate
+PlanEat/Conversations.txt
+
+# Local credentials and machine-specific settings
+Secrets.xcconfig
+*.secrets.xcconfig

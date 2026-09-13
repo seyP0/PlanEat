@@ -91,12 +91,10 @@ struct CalendarSmileView: View {
         .background(Color.white)
     }
 }
-
-
-struct CalendarSmileView_Previews: PreviewProvider {
-    static var previews: some View {
-        CalendarSmileView()
-    }
-}
-
-
+//
+//
+//struct CalendarSmileView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CalendarSmileView()
+//    }
+//}
