@@ -28,7 +28,7 @@ The demo runs in the iOS Simulator. The meals and photos shown are the app's bui
 | Auth and data | Firebase Authentication, Cloud Firestore |
 | AI | OpenAI API (GPT-4o mini for meal text, DALL-E 3 for meal images) |
 | Design | Figma |
-| Fonts | Baloo Bhaijaan 2, ABeeZee (Google Fonts) |
+| Fonts | Baloo Bhaijaan 2 for headings and subheads, Gamja Flower for body text (both from Google Fonts, bundled in the app)|
 
 ## Team
 
