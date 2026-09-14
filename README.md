@@ -1,4 +1,4 @@
-\# PlanEat: mood-based AI meal planner for iOS
+## PlanEat: mood-based AI meal planner for iOS
 
 PlanEat is an iOS app built with SwiftUI, Firebase, and the OpenAI API. It asks how you feel each day and suggests breakfast, lunch, dinner, and a snack to match, with calories and ingredients for each meal. Your profile (age, goals, health conditions) shapes the suggestions, and everything you log is saved to your account.
 
