@@ -1,4 +1,4 @@
-## PlanEat: mood-based AI meal planner for iOS
+# PlanEat: mood-based AI meal planner for iOS
 
 PlanEat is an iOS app built with SwiftUI, Firebase, and the OpenAI API. It asks how you feel each day and suggests breakfast, lunch, dinner, and a snack to match, with calories and ingredients for each meal. Your profile (age, goals, health conditions) shapes the suggestions, and everything you log is saved to your account.
 
@@ -6,7 +6,7 @@ PlanEat is an iOS app built with SwiftUI, Firebase, and the OpenAI API. It asks 
 
 https://github.com/user-attachments/assets/6f5f7f04-452e-4484-bd19-f5cb4392a57f
 
-The demo runs in the iOS Simulator. The meals and photos shown are the app's built-in fallback content, which appears whenever the OpenAI API is unavailable. The project does not currently have API credits, so the live path is not active in this recording. With a key and credits, meal text comes from GPT-4o mini and meal images from DALL-E 3, and the same screens show the generated results.
+The demo runs in the iOS Simulator. The meal names, ingredients and calorie ranges are real GPT-4o mini responses for the mood and goal selected in the app. Image generation is switched off in this build, so instead of a DALL-E 3 photo each card shows a plain colored panel. Turn image generation on and the same cards show generated photos.
 
 ## What it does
 
@@ -28,11 +28,11 @@ The demo runs in the iOS Simulator. The meals and photos shown are the app's bui
 | Auth and data | Firebase Authentication, Cloud Firestore |
 | AI | OpenAI API (GPT-4o mini for meal text, DALL-E 3 for meal images) |
 | Design | Figma |
-| Fonts | Baloo Bhaijaan 2 for headings and subheads, Gamja Flower for body text (both from Google Fonts, bundled in the app)|
+| Fonts | Baloo Bhaijaan 2 for the interface, Gamja Flower for the wordmark and mood labels (both from Google Fonts, bundled in the app) |
 
 ## Team
 
-- **Jimin Kim**: UI design in Figma and the SwiftUI front-end (all screens, navigation, loading and fallback states, image caching).
+- **Jimin Kim**: UI design in Figma and the SwiftUI front-end (all screens, navigation, loading and missing-photo states, image caching).
 - **Seyeon Bark**: full-stack development, Firebase setup, OpenAI integration.
 - **David Kim**: full-stack development, Firebase setup, OpenAI integration.
 
